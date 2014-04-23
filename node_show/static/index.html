@@ -77,26 +77,45 @@ $(document).ready(function() {
 	var plotChart = $.jqplot("plot_wrapper", [[0]]);
 
 
+	var filterCell = [];
+	var cellQ = 0.8;
+
+	var i;
+	for (i=0; i<64; ++i) {
+		filterCell[i] = 0.0;
+	}
+
 	var renderGrpah = function(dataList) {
 		//alert(data.firArray);
 		var i;
 		for (i=0; i<64; ++i) {
-			firCell[i].text(dataList[i]);
-			r = map(dataList[i], lowTemp, highTemp, 0.0, 255.0);
+
+			filterCell[i] = cellQ * filterCell[i] + (1.0 - cellQ) * dataList[i];
+
+			firCell[i].text(filterCell[i].toFixed(2));
+			r = map(filterCell[i], lowTemp, highTemp, 0.0, 255.0);
 			r = constraint(r, 0, 255);
 			g = 0.0;
-			b = map(dataList[i], lowTemp, highTemp, 255.0, 0.0);
+			b = map(filterCell[i], lowTemp, highTemp, 255.0, 0.0);
 			b = constraint(b, 0, 255);
 
 			firCell[i].css("background-color", "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")");
 
-			if (dataList[i] > threshold) {
+			if (filterCell[i] > threshold) {
 				filteredCell[i].css("background-color", "white");
 			} else {
 				filteredCell[i].css("background-color", "gray");
 			}
 		}
 	};
+
+	var filterDiff = 0;
+	var diffQ = 0.8;
+
+	var DIFF_THRESHOLD = 5.0;
+	var CELL_DIFF_THRESHOLD = 2.5;
+
+
 
 	var processData = function(dataList) {
 		var olist = sortArray(dataList);
@@ -105,20 +124,55 @@ $(document).ready(function() {
 		//consider only from olist[2] to olist[61];
 		var i;
 		var conList = [];
+		var x, y;
 		for (i=2; i<62; ++i) {
 			conList[i-2] = olist[i];
 		}
 
 		plotChart.destroy();
 		//console.log(olist);
-		plotChart = $.jqplot("plot_wrapper", [conList]);
+		plotChart = $.jqplot("plot_wrapper", [conList], {axes: {yaxis:{min:15, max:40}}});
 
 		var minIr = conList[0];
 		var maxIr = conList[59];
 
+
+		var diff = (maxIr - minIr);
+
+		var headInRow = [];
+
+		/*
+		filterDiff = diffQ * filterDiff + (1.0 - diffQ) * diff;
+		for (y=0; y<4; ++y) {
+			for (x=0; x<16-1; ++x) {
+				if ((filterCell[y*16+x+1]-filterCell[y*16+x] > CELL_DIFF_THRESHOLD) && filterCell[y*16+x+1] > olist[4]+CELL_DIFF_THRESHOLD) {
+					headInRow[y] = x+1;
+					break;
+				}
+				if (headInRow[y] == undefined) {
+					headInRow[y] = 100; //this is a magic number
+				}
+			}
+
+		}
+*/
+
 		$("#min-temp-text").text(minIr);
 		$("#max-temp-text").text(maxIr);
-		$("#temp-diff-text").text(Number(maxIr-minIr));
+		$("#temp-diff-text").text(diff);
+		$("#filtered-diff-text").text(filterDiff);
+		if (filterDiff > DIFF_THRESHOLD) {
+			$("#filtered-diff-text").css("background-color", "red");
+			$("#filtered-diff-text").css("color", "white");
+			$("#head-in-row0").text(headInRow[0]);
+			$("#head-in-row1").text(headInRow[1]);
+			$("#head-in-row2").text(headInRow[2]);
+			$("#head-in-row3").text(headInRow[3]);
+		} else {
+			$("#filtered-diff-text").css("background-color", "white");
+			$("#filtered-diff-text").css("color", "black");
+		}
+
 	};
 
 	var onNewFirArray = function(data, textStatus, jqXHR) {
@@ -197,7 +251,14 @@ $(document).ready(function() {
 
 		MinTemp: <span id="min-temp-text">N/A</span> &nbsp;&nbsp;&nbsp;&nbsp;
 		MaxTemp: <span id="max-temp-text">N/A</span> &nbsp;&nbsp;&nbsp;&nbsp;
-		TempDiff: <span id="temp-diff-text">N/A</span>
+		TempDiff: <span id="temp-diff-text">N/A</span> &nbsp;&nbsp;&nbsp;&nbsp;
+		Diff: <span id="filtered-diff-text">N/A</span><br />
+		<h3>Head Position</h3>
+		Row1: <span id="head-in-row0">N/A</span><br />
+		Row2: <span id="head-in-row1">N/A</span><br />
+		Row3: <span id="head-in-row2">N/A</span><br />
+		Row4: <span id="head-in-row3">N/A</span><br />
+
 
 
 	</body>
