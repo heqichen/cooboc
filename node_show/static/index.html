@@ -5,8 +5,16 @@
 <script>
 
 
+var lowTemp = 15.0;
+var highTemp = 40.0;
+
 var map = function(x, in_min, in_max, out_min, out_max) {
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	x = parseFloat(x);
+	in_min = parseFloat(in_min);
+	in_max = parseFloat(in_max);
+	out_min = parseFloat(out_min);
+	out_max = parseFloat(out_max);
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 var constraint = function(x, in_min, in_max) {
@@ -32,6 +40,13 @@ $(document).ready(function() {
 		}
 	}
 
+	$("#lowTemp").on("change", function(){
+		lowTemp = $("#lowTemp").val();
+	});
+	$("#highTemp").on("change", function(){
+		highTemp = $("#highTemp").val();
+	});
+
 
 	var onNewFirArray = function(data, textStatus, jqXHR) {
 		//alert(data.firArray);
@@ -39,10 +54,10 @@ $(document).ready(function() {
 		for (i=0; i<64; ++i)
 		{
 			firCell[i].text(data.firArray[i]);
-			r = map(data.firArray[i], 15.0, 40.0, 0.0, 255.0);
+			r = map(data.firArray[i], lowTemp, highTemp, 0.0, 255.0);
 			r = constraint(r, 0, 255);
 			g = 0.0;
-			b = map(data.firArray[i], 15.0, 40.0, 255.0, 0.0);
+			b = map(data.firArray[i], lowTemp, highTemp, 255.0, 0.0);
 			b = constraint(b, 0, 255);
 
 			firCell[i].css("background-color", "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")");
@@ -78,13 +93,16 @@ $(document).ready(function() {
 	width:	100px;
 	height:	50px;
 	display: block;
+	text-align:	center;
+	font-weight: bold;
+	color:	white;
 }
 </style>
 	</head>
 	<body>
 		<div id="wrapper">&nbsp;</div> <br />
 		<div id="control_panel">
-			Low Temperature: <input type="text" value="15"/>, High Temperature: <input type="text" value="40" />
+			Low Temperature: <input type="text" value="15.0" id="lowTemp"/>, High Temperature: <input type="text" value="40.0" id="highTemp"/>
 		</div>
 	</body>
 </html>
