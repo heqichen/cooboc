@@ -1,7 +1,11 @@
 <html>
 	<head>
 		<title>Head Position Detect for Faurecia</title>
-		<script src="/static/jquery-1.11.2.min.js"></script>
+		<script type="text/javascript" src="/static/jquery-1.11.2.min.js"></script>
+		<script language="javascript" type="text/javascript" src="/static/jquery.jqplot.min.js"></script>
+		<script type="text/javascript" src="/static/jqplot.canvasTextRenderer.min.js"></script>
+		<script type="text/javascript" src="/static/jqplot.canvasAxisLabelRenderer.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="/static/jquery.jqplot.css" />
 <script>
 
 
@@ -56,27 +60,71 @@ $(document).ready(function() {
 		$("#threshold-text").text(threshold);
 	});
 
+	var sortArray = function(ulist) {
+		var alist = [];
+		var i, j;
+		for (i=0; i<ulist.length; ++i)
+		{
+			alist[i] = ulist[i];
+		}
 
-	var onNewFirArray = function(data, textStatus, jqXHR) {
+		alist.sort();
+		
+
+		return alist;
+	}
+
+	var plotChart = $.jqplot("plot_wrapper", [[0]]);
+
+
+	var renderGrpah = function(dataList) {
 		//alert(data.firArray);
 		var i;
 		for (i=0; i<64; ++i) {
-			firCell[i].text(data.firArray[i]);
-			r = map(data.firArray[i], lowTemp, highTemp, 0.0, 255.0);
+			firCell[i].text(dataList[i]);
+			r = map(dataList[i], lowTemp, highTemp, 0.0, 255.0);
 			r = constraint(r, 0, 255);
 			g = 0.0;
-			b = map(data.firArray[i], lowTemp, highTemp, 255.0, 0.0);
+			b = map(dataList[i], lowTemp, highTemp, 255.0, 0.0);
 			b = constraint(b, 0, 255);
 
 			firCell[i].css("background-color", "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")");
 
-			if (data.firArray[i] > threshold) {
+			if (dataList[i] > threshold) {
 				filteredCell[i].css("background-color", "white");
 			} else {
 				filteredCell[i].css("background-color", "gray");
 			}
-
 		}
+	};
+
+	var processData = function(dataList) {
+		var olist = sortArray(dataList);
+
+
+		//consider only from olist[2] to olist[61];
+		var i;
+		var conList = [];
+		for (i=2; i<62; ++i) {
+			conList[i-2] = olist[i];
+		}
+
+		plotChart.destroy();
+		//console.log(olist);
+		plotChart = $.jqplot("plot_wrapper", [conList]);
+
+		var minIr = conList[0];
+		var maxIr = conList[59];
+
+		$("#min-temp-text").text(minIr);
+		$("#max-temp-text").text(maxIr);
+		$("#temp-diff-text").text(Number(maxIr-minIr));
+	};
+
+	var onNewFirArray = function(data, textStatus, jqXHR) {
+		renderGrpah(data.firArray);
+		processData(data.firArray);
+
 	};
 
 	var updateData = function() {
@@ -88,7 +136,13 @@ $(document).ready(function() {
 		});
 	};
 
+
+
 	setInterval(updateData, 200);
+
+
+	
+
 
 });
 </script>
@@ -107,6 +161,12 @@ $(document).ready(function() {
 	width:	1600px;
 	height:	200px;
 	display:	inline-block;
+}
+
+#plot_wrapper
+{
+	width:	1600px;
+	height:	200px;
 }
 
 .fir_cell
@@ -131,6 +191,14 @@ $(document).ready(function() {
 
 
 		</div><br />
-		<div id="filtered_wrapper">&nbsp;</div>
+		<div id="filtered_wrapper">&nbsp;</div> <br/ >
+
+		<div id="plot_wrapper">&nbsp;</div> <br />
+
+		MinTemp: <span id="min-temp-text">N/A</span> &nbsp;&nbsp;&nbsp;&nbsp;
+		MaxTemp: <span id="max-temp-text">N/A</span> &nbsp;&nbsp;&nbsp;&nbsp;
+		TempDiff: <span id="temp-diff-text">N/A</span>
+
+
 	</body>
 </html>
