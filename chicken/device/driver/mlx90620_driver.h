@@ -15,11 +15,10 @@ class Mlx90620Driver
 {
 
 	public:
-		Mlx90620Driver(Io *io, uint8_t address);
+		Mlx90620Driver(Io *io, char *serialPath);
 	private:
-		IicHandler *mIicHandler;
-		uint8_t mAddress;
-
+		SerialHandler *mSerialHandler;
+		char *serialPath;
 };
 
 

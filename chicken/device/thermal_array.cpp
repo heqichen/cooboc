@@ -15,7 +15,7 @@ ThermalArray::ThermalArray(Io *io)
 	:	IDevice	(io, DEVICE_TYPE_THERMAL_ARRAY),
 		mMlx90620	(NULL)
 {
-
+	
 }
 
 ThermalArray::~ThermalArray()
@@ -29,7 +29,7 @@ ThermalArray::~ThermalArray()
 
 void ThermalArray::init()
 {
-	mMlx90620 = new Mlx90620Driver(mIo, 0x50);
+	mMlx90620 = new Mlx90620Driver(mIo, "/dev/ttyUSB0");
 }
 
 
