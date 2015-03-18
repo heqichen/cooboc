@@ -196,7 +196,7 @@ void Mlx90620::calculateTa()
 }
 
 
-void Mlx90620::getFirArray()
+void Mlx90620::updateFirArray()
 {
 	// check por
 	if (millis() - lastPorCheckTime > POR_CHECK_TIMEOUT)
@@ -214,9 +214,7 @@ void Mlx90620::getFirArray()
 	}
 
 	updateIrData();
-
 	calculateTo();
-
 }
 
 //Reads the current configuration register (2 bytes) from the MLX
@@ -351,18 +349,7 @@ void Mlx90620::initCalibrationData()
 void Mlx90620::calculateTo()	//Object Temperature
 {
 	int vCp = readCompensationPixel();
-
-
-	//for test;
-	vCp = -40;
-	mAcp = -48;
-	mBcp = -54;
-	mBiScale = 8;
-	mTa = 28.16;
-
 	double vCpOffComp = vCp - mAcp - mBcp/pow(2.0, mBiScale)*(mTa-25.0);
-
-	Serial.println(vCpOffComp);
 
 	int i, j;
 	for (j=0; j<16; ++j)
@@ -387,30 +374,6 @@ void Mlx90620::calculateTo()	//Object Temperature
 		}
 	}
 
-
-/*
-  float v_ir_off_comp;
-  float v_ir_tgc_comp;
-  float v_ir_comp;
-
-  //Calculate the offset compensation for the one compensation pixel
-  //This is a constant in the TO calculation, so calculate it here.
-  int cpix = readCPIX_MLX90620(); //Go get the raw data of the compensation pixel
-  float v_cp_off_comp = (float)cpix - (a_cp + (b_cp/pow(2, b_i_scale)) * (Tambient - 25)); 
-
-  for (int i = 0 ; i < 64 ; i++)
-  {
-    v_ir_off_comp = irData[i] - (a_ij[i] + (float)(b_ij[i]/pow(2, b_i_scale)) * (Tambient - 25)); //#1: Calculate Offset Compensation 
-
-    v_ir_tgc_comp = v_ir_off_comp - ( ((float)tgc/32) * v_cp_off_comp); //#2: Calculate Thermal Gradien Compensation (TGC)
-
-    v_ir_comp = v_ir_tgc_comp / emissivity; //#3: Calculate Emissivity Compensation
-
-    temperatures[i] = sqrt( sqrt( (v_ir_comp/alpha_ij[i]) + pow(Tambient + 273.15, 4) )) - 273.15;
-  }
-
-  */
-
 }
 
 
@@ -428,4 +391,16 @@ void Mlx90620::printTo()
 		Serial.println();
 	}
 	Serial.println();
+}
+
+void Mlx90620::getTo(double thermalArray[][16])
+{
+	int i, j;
+	for (i=0; i<4; ++i)
+	{
+		for (j=0; j<16; ++j)
+		{
+			thermalArray[i][j] = mTo[i][j];
+		}
+	}
 }

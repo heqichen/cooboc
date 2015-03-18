@@ -24,10 +24,10 @@ class Mlx90620
 		void printEeprom();
 		double getTemperatureAmbient();
 		void printAlpha();
-		void getFirArray();
-
+		void updateFirArray();
+		void getTo(double thermalArray[][16]);
 		void printTo();
-		
+
 	private:
 		//init seq #1
 		void initReadWholeEeprom();	//7.1 P10 on Datashit
