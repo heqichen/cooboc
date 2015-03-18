@@ -21,8 +21,9 @@ void Mlx90620::init()
 
 
 	initReadWholeEeprom();
-	initCalculateAlpha();
 	initCalibrationData();
+	initCalculateAlpha();
+	
 	initWriteOscillatorTrimmingValue();
 	writeConfigurationRegister();
 	calculateTa();
@@ -131,7 +132,7 @@ void Mlx90620::writeConfigurationRegister()
 
 //Reads the PTAT data from the MLX
 //Returns an unsigned int containing the PTAT
-unsigned int Mlx90620::readPTAT_MLX90620()
+unsigned int Mlx90620::readPtat()
 {
   i2c_start_wait(MLX90620_WRITE);
   i2c_write(CMD_READ_REGISTER); //Command = read PTAT
@@ -170,30 +171,20 @@ uint8_t Mlx90620::readU8FromEepromData(uint8_t address)
 	return (uint8_t)mEepromData[address];
 }
 
-void Mlx90620::initCalibrationData()
+int8_t Mlx90620::readS8FromEepromData(uint8_t address)
 {
-	mVTH = readS16FromEepromData(MLX_EEPROM_VTH_L);
-	mKT1 = (double)readS16FromEepromData(MLX_EEPROM_KT1_L) / 1024.0;
-	mKT2 = (double)readS16FromEepromData(MLX_EEPROM_KT2_L) / 1048576.0;
-
-	Serial.print("mVTH: ");
-	Serial.println(mVTH);
-	Serial.print("mKT1: ");
-	Serial.println(mKT1);
-	Serial.print("mKT2: ");
-	Serial.println(mKT2);
-
+	return (int8_t)mEepromData[address];
 }
 
 
 
-//Gets the latest PTAT (package temperature ambient) reading from the MLX
+//Gets the latest PTAT (package ambient temperature) reading from the MLX
 //Then calculates a new Tambient
 //Many of these values (k_t1, v_th, etc) come from varInitialization and EEPROM reading
 //This has been tested to match example 7.3.2
 void Mlx90620::calculateTa()
 {
-	unsigned int ptat = readPTAT_MLX90620();
+	unsigned int ptat = readPtat();
 
 	double temp;
 	temp = mKT1*mKT1 - (4.0 * mKT2 * (mVTH - (double)ptat));
@@ -210,7 +201,7 @@ void Mlx90620::getFirArray()
 	// check por
 	if (millis() - lastPorCheckTime > POR_CHECK_TIMEOUT)
 	{
-		//1. update Temperature Ambient
+		//1. update Ambient Temperature
 		calculateTa();
 		//2. check POR
 		if (isPor())
@@ -222,7 +213,9 @@ void Mlx90620::getFirArray()
 		lastPorCheckTime = millis();
 	}
 
-	readIrData();
+	updateIrData();
+
+	calculateTo();
 
 }
 
@@ -256,7 +249,7 @@ bool Mlx90620::isPor()
 
 //Reads 64 bytes of pixel data from the MLX
 //Loads the data into the irData array
-void Mlx90620::readIrData()
+void Mlx90620::updateIrData()
 {
 	//read whole frame, P12 on Datashit
 	i2c_start_wait(MLX90620_WRITE);
@@ -266,11 +259,18 @@ void Mlx90620::readIrData()
 	i2c_write(0x40); //Number of reads is 64
 	i2c_rep_start(MLX90620_READ);
 
-	for(int i = 0 ; i < 64 ; i++)
+	int i, j;
+	for (j=0; j<16; ++j)
 	{
-		byte pixelDataLow = i2c_readAck();
-		byte pixelDataHigh = i2c_readAck();
-		mIrData[i] = (int)(pixelDataHigh << 8) | pixelDataLow;
+		for (i=0; i<4; ++i)
+		{
+			byte pixelDataLow = i2c_readAck();
+			byte pixelDataHigh = i2c_readAck();
+			int16_t irData = pixelDataHigh;
+			irData <<= 8;
+			irData |= pixelDataLow;
+			mIrData[i][j] = irData;
+		}
 	}
 
 	i2c_stop();
@@ -281,8 +281,10 @@ void Mlx90620::initCalculateAlpha()
 	uint16_t alpha0 = readU16FromEepromData(MLX_EEPROM_CAL_A0_L);
 	uint8_t alpha0scale = readU8FromEepromData(MLX_EEPROM_CAL_A0_SCALE);
 	uint8_t deltaAlphaScale = readU8FromEepromData(MLX_EEPROM_CAL_DELTA_A_SCALE);
+	uint16_t alphaCp = readU16FromEepromData(MLX_EEPROM_CAL_alphaCP_L);
 
-	double commonItem = (double)alpha0 / (pow(2.0, alpha0scale));
+
+	double commonItem = ((double)alpha0 - mTgc/32.0*alphaCp) / (pow(2.0, alpha0scale));
 
 	int i, j;
 	for (j=0; j<16; ++j)
@@ -307,4 +309,123 @@ void Mlx90620::printAlpha()
 		}
 		Serial.println();
 	}
+}
+
+
+//Read the compensation pixel 16 bit data
+int Mlx90620::readCompensationPixel()
+{
+  i2c_start_wait(MLX90620_WRITE);
+  i2c_write(CMD_READ_REGISTER); //Command = read register
+  i2c_write(0x91);
+  i2c_write(0x00);
+  i2c_write(0x01);
+  i2c_rep_start(MLX90620_READ);
+
+  byte cpixLow = i2c_readAck(); //Grab the two bytes
+  byte cpixHigh = i2c_readAck();
+  i2c_stop();
+
+  return ( (int)(cpixHigh << 8) | cpixLow);
+}
+
+
+void Mlx90620::initCalibrationData()
+{
+	mVTH = readS16FromEepromData(MLX_EEPROM_VTH_L);
+	mKT1 = (double)readS16FromEepromData(MLX_EEPROM_KT1_L) / 1024.0;
+	mKT2 = (double)readS16FromEepromData(MLX_EEPROM_KT2_L) / 1048576.0;
+
+	mAcp = readS8FromEepromData(MLX_EEPROM_CAL_ACP);
+	mBcp = readS8FromEepromData(MLX_EEPROM_CAL_BCP);
+	mBiScale = readU8FromEepromData(MLX_EEPROM_CAL_BI_SCALE);
+	mTgc = readS8FromEepromData(MLX_EEPROM_CAL_TGC);
+	uint16_t epsilon = readU16FromEepromData(MLX_EEPROM_CAL_EMIS_L);
+	mEmissivity = (double)epsilon/32768.0;
+}
+
+
+//Calculate the temperatures seen for each pixel
+//Relies on the raw irData array
+//Returns an 64-int array called temperatures
+void Mlx90620::calculateTo()	//Object Temperature
+{
+	int vCp = readCompensationPixel();
+
+
+	//for test;
+	vCp = -40;
+	mAcp = -48;
+	mBcp = -54;
+	mBiScale = 8;
+	mTa = 28.16;
+
+	double vCpOffComp = vCp - mAcp - mBcp/pow(2.0, mBiScale)*(mTa-25.0);
+
+	Serial.println(vCpOffComp);
+
+	int i, j;
+	for (j=0; j<16; ++j)
+	{
+		for (i=0; i<4; ++i)
+		{
+			int ai = readS8FromEepromData(4*j + i);
+			int bi = readS8FromEepromData(0x40 + 4*j + i);
+			double vIrOffComp = mIrData[i][j] - ai - bi/pow(2.0, mBiScale)*(mTa-25.0);
+			double vIrTgcComp = vIrOffComp - (float)mTgc/32.0*vCpOffComp;
+			double vIrCompensated = vIrTgcComp / mEmissivity;
+
+			mTo[i][j] = 
+				sqrt(
+					sqrt(
+						vIrCompensated/mAlpha[i][j] 
+						+ pow(
+							mTa+273.15, 4.0
+						)
+					)
+				) - 273.15;
+		}
+	}
+
+
+/*
+  float v_ir_off_comp;
+  float v_ir_tgc_comp;
+  float v_ir_comp;
+
+  //Calculate the offset compensation for the one compensation pixel
+  //This is a constant in the TO calculation, so calculate it here.
+  int cpix = readCPIX_MLX90620(); //Go get the raw data of the compensation pixel
+  float v_cp_off_comp = (float)cpix - (a_cp + (b_cp/pow(2, b_i_scale)) * (Tambient - 25)); 
+
+  for (int i = 0 ; i < 64 ; i++)
+  {
+    v_ir_off_comp = irData[i] - (a_ij[i] + (float)(b_ij[i]/pow(2, b_i_scale)) * (Tambient - 25)); //#1: Calculate Offset Compensation 
+
+    v_ir_tgc_comp = v_ir_off_comp - ( ((float)tgc/32) * v_cp_off_comp); //#2: Calculate Thermal Gradien Compensation (TGC)
+
+    v_ir_comp = v_ir_tgc_comp / emissivity; //#3: Calculate Emissivity Compensation
+
+    temperatures[i] = sqrt( sqrt( (v_ir_comp/alpha_ij[i]) + pow(Tambient + 273.15, 4) )) - 273.15;
+  }
+
+  */
+
+}
+
+
+void Mlx90620::printTo()
+{
+	int i, j;
+	for (i=0; i<4; ++i)
+	{
+		for (j=0; j<16; ++j)
+		{
+			Serial.print(mTo[i][j]);
+			Serial.print(" ");
+		}
+
+		Serial.println();
+	}
+	Serial.println();
 }

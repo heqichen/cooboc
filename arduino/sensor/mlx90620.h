@@ -25,21 +25,31 @@ class Mlx90620
 		double getTemperatureAmbient();
 		void printAlpha();
 		void getFirArray();
+
+		void printTo();
+		
 	private:
 		//init seq #1
 		void initReadWholeEeprom();	//7.1 P10 on Datashit
 		//init seq #2
 		void initWriteOscillatorTrimmingValue(); //7.1 P10 on Datashit
+		//init seq #3
+		void initCalibrationData();
+		//init seq #4
 		void initCalculateAlpha();
+		
+
 		void writeConfigurationRegister();	//7.1 P10 on Datashit
 		
-		void initCalibrationData();
+		
 
 
-		unsigned int readPTAT_MLX90620();
+		unsigned int readPtat();
 		void calculateTa();
-		void readIrData();
 
+		void updateIrData();
+		int readCompensationPixel();
+		void calculateTo();
 
 
 		uint16_t readConfigurationRegister();
@@ -48,6 +58,7 @@ class Mlx90620
 		int16_t readS16FromEepromData(uint8_t lsb);
 		uint16_t readU16FromEepromData(uint8_t lsb);
 		uint8_t readU8FromEepromData(uint8_t address);
+		int8_t readS8FromEepromData(uint8_t address);
 
 		unsigned long lastPorCheckTime;
 		byte mEepromData[256];
@@ -56,8 +67,16 @@ class Mlx90620
 		double mKT1;
 		double mKT2;
 		double mVTH;
-		int mIrData[64]; //Contains the raw IR data from the sensor
+		int mIrData[4][16]; //Contains the raw IR data from the sensor
 		double mAlpha[4][16];
+
+		int mAcp;
+		int mBcp;
+		int mBiScale;
+		int mTgc;
+		double mEmissivity;
+
+		double mTo[4][16];
 };
 
 

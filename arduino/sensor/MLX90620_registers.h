@@ -13,14 +13,7 @@
 //These are commands
 #define CMD_READ_REGISTER 0x02
 
-//Begin registers
 
-#define CAL_ACP 0xD4
-#define CAL_BCP 0xD5
-#define CAL_alphaCP_L 0xD6
-#define CAL_alphaCP_H 0xD7
-#define CAL_TGC 0xD8
-#define CAL_BI_SCALE 0xD9
 
 #define VTH_L 0xDA
 #define VTH_H 0xDB
@@ -46,6 +39,16 @@
 //Bits within configuration register 0x92
 
 #define POR_TEST 10
+
+
+//Begin registers
+
+#define MLX_EEPROM_CAL_ACP 0xD4
+#define MLX_EEPROM_CAL_BCP 0xD5
+#define MLX_EEPROM_CAL_alphaCP_L 0xD6
+#define MLX_EEPROM_CAL_alphaCP_H 0xD7
+#define MLX_EEPROM_CAL_TGC 0xD8
+#define MLX_EEPROM_CAL_BI_SCALE 0xD9
 
 #define MLX_EEPROM_VTH_L 0xDA
 #define MLX_EEPROM_VTH_H 0xDB

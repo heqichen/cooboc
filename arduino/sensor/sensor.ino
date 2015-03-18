@@ -45,6 +45,7 @@ void loop()
 {
 	m2.getFirArray();
 	Serial.println(m2.getTemperatureAmbient());
+	m2.printTo();
 	delay(5000);
 }
 
@@ -55,6 +56,9 @@ unsigned int readPTAT_MLX90620(){return 0;}
 void calculate_TA(void){}
 bool checkConfig_MLX90620(){return false;}
 void readIR_MLX90620(){}
+int readCPIX_MLX90620() {return 0;}
+void calculate_TO(){}
+
 
 
 void loop2()
@@ -83,6 +87,7 @@ void loop2()
 //From the 256 bytes of EEPROM data, initialize 
 void varInitialization(byte calibration_data[])
 {
+	/*
   emissivity = ((unsigned int)256 * calibration_data[CAL_EMIS_H] + calibration_data[CAL_EMIS_L]) / 32768.0;
   
   a_cp = calibration_data[CAL_ACP];
@@ -106,7 +111,7 @@ void varInitialization(byte calibration_data[])
     b_ij[i] = calibration_data[0x40 + i]; //Bi(i,j) begins 64 bytes into EEPROM at 0x40
     if(b_ij[i] > 127) b_ij[i] -= 256;
   }
-  
+  */
 }
 
 
@@ -119,50 +124,11 @@ void varInitialization(byte calibration_data[])
 
 
 
-//Calculate the temperatures seen for each pixel
-//Relies on the raw irData array
-//Returns an 64-int array called temperatures
-void calculate_TO()
-{
-  float v_ir_off_comp;
-  float v_ir_tgc_comp;
-  float v_ir_comp;
-
-  //Calculate the offset compensation for the one compensation pixel
-  //This is a constant in the TO calculation, so calculate it here.
-  int cpix = readCPIX_MLX90620(); //Go get the raw data of the compensation pixel
-  float v_cp_off_comp = (float)cpix - (a_cp + (b_cp/pow(2, b_i_scale)) * (Tambient - 25)); 
-
-  for (int i = 0 ; i < 64 ; i++)
-  {
-    v_ir_off_comp = irData[i] - (a_ij[i] + (float)(b_ij[i]/pow(2, b_i_scale)) * (Tambient - 25)); //#1: Calculate Offset Compensation 
-
-    v_ir_tgc_comp = v_ir_off_comp - ( ((float)tgc/32) * v_cp_off_comp); //#2: Calculate Thermal Gradien Compensation (TGC)
-
-    v_ir_comp = v_ir_tgc_comp / emissivity; //#3: Calculate Emissivity Compensation
-
-    temperatures[i] = sqrt( sqrt( (v_ir_comp/alpha_ij[i]) + pow(Tambient + 273.15, 4) )) - 273.15;
-  }
-}
 
 
 
-//Read the compensation pixel 16 bit data
-int readCPIX_MLX90620()
-{
-  i2c_start_wait(MLX90620_WRITE);
-  i2c_write(CMD_READ_REGISTER); //Command = read register
-  i2c_write(0x91);
-  i2c_write(0x00);
-  i2c_write(0x01);
-  i2c_rep_start(MLX90620_READ);
 
-  byte cpixLow = i2c_readAck(); //Grab the two bytes
-  byte cpixHigh = i2c_readAck();
-  i2c_stop();
 
-  return ( (int)(cpixHigh << 8) | cpixLow);
-}
 
 
 
