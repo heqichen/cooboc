@@ -47,3 +47,9 @@
 
 #define POR_TEST 10
 
+#define MLX_EEPROM_VTH_L 0xDA
+#define MLX_EEPROM_VTH_H 0xDB
+#define MLX_EEPROM_KT1_L 0xDC
+#define MLX_EEPROM_KT1_H 0xDD
+#define MLX_EEPROM_KT2_L 0xDE
+#define MLX_EEPROM_KT2_H 0xDF
