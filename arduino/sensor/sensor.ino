@@ -21,33 +21,31 @@ int a_ij[64], b_ij[64];
 
 //These values are calculated using equation 7.3.3.2
 //They are constants and can be calculated using the MLX90620_alphaCalculator sketch
-float alpha_ij[64] = {
-  1.66583E-8, 1.85792E-8, 1.78807E-8, 1.57270E-8, 1.87538E-8, 2.05582E-8, 1.98597E-8, 1.81717E-8, 
-  2.05582E-8, 2.21880E-8, 2.27119E-8, 1.96269E-8, 2.27701E-8, 2.45745E-8, 2.45745E-8, 2.10239E-8, 
-  2.43417E-8, 2.62044E-8, 2.59715E-8, 2.31776E-8, 2.50402E-8, 2.77178E-8, 2.74267E-8, 2.46328E-8, 
-  2.57969E-8, 2.83580E-8, 2.76596E-8, 2.50984E-8, 2.60297E-8, 2.88237E-8, 2.86491E-8, 2.57387E-8, 
-  2.62044E-8, 2.86491E-8, 2.85909E-8, 2.50402E-8, 2.62626E-8, 2.90565E-8, 2.85909E-8, 2.50402E-8, 
-  2.55059E-8, 2.83580E-8, 2.78924E-8, 2.57387E-8, 2.52730E-8, 2.76596E-8, 2.74267E-8, 2.52730E-8, 
-  2.41089E-8, 2.62044E-8, 2.66700E-8, 2.45745E-8, 2.27701E-8, 2.57387E-8, 2.55059E-8, 2.31194E-8, 
-  2.12567E-8, 2.41089E-8, 2.41089E-8, 2.21880E-8, 1.92194E-8, 2.27119E-8, 2.21880E-8, 2.05582E-8, 
-};
+float alpha_ij[64];
 
 byte loopCount = 0; //Used in main loop
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+
+
+
+
 Mlx90620 m2;
+
 
 void setup()
 {
 	Serial.begin(9600);
 	m2.init();
 	m2.printEeprom();
+	m2.printAlpha();
 }
 
 void loop()
 {
-	Serial.println(sizeof(double));
-	delay(500);
+	m2.getFirArray();
+	Serial.println(m2.getTemperatureAmbient());
+	delay(5000);
 }
 
 //Begin Program code
@@ -55,23 +53,9 @@ void loop()
 void read_EEPROM_MLX90620(){}
 unsigned int readPTAT_MLX90620(){return 0;}
 void calculate_TA(void){}
+bool checkConfig_MLX90620(){return false;}
+void readIR_MLX90620(){}
 
-void setup2()
-{
-  Serial.begin(9600);
-  Serial.println("MLX90620 Example");
-
-  i2c_init(); //Init the I2C pins
-  PORTC = (1 << PORTC4) | (1 << PORTC5); //Enable pull-ups
-
-  delay(5); //Init procedure calls for a 5ms delay after power-on
-
-  read_EEPROM_MLX90620(); //Read the entire EEPROM
-
-  //setConfiguration(refreshRate); //Configure the MLX sensor with the user's choice of refresh rate
-
-  calculate_TA(); //Calculate the current Tambient
-}
 
 void loop2()
 {
@@ -99,9 +83,6 @@ void loop2()
 //From the 256 bytes of EEPROM data, initialize 
 void varInitialization(byte calibration_data[])
 {
-  v_th = 256 * calibration_data[VTH_H] + calibration_data[VTH_L];
-  k_t1 = (256 * calibration_data[KT1_H] + calibration_data[KT1_L]) / 1024.0; //2^10 = 1024
-  k_t2 = (256 * calibration_data[KT2_H] + calibration_data[KT2_L]) / 1048576.0; //2^20 = 1,048,576
   emissivity = ((unsigned int)256 * calibration_data[CAL_EMIS_H] + calibration_data[CAL_EMIS_L]) / 32768.0;
   
   a_cp = calibration_data[CAL_ACP];
@@ -164,26 +145,7 @@ void calculate_TO()
   }
 }
 
-//Reads 64 bytes of pixel data from the MLX
-//Loads the data into the irData array
-void readIR_MLX90620()
-{
-  i2c_start_wait(MLX90620_WRITE);
-  i2c_write(CMD_READ_REGISTER); //Command = read a register
-  i2c_write(0x00); //Start address = 0x00
-  i2c_write(0x01); //Address step = 1
-  i2c_write(0x40); //Number of reads is 64
-  i2c_rep_start(MLX90620_READ);
 
-  for(int i = 0 ; i < 64 ; i++)
-  {
-    byte pixelDataLow = i2c_readAck();
-    byte pixelDataHigh = i2c_readAck();
-    irData[i] = (int)(pixelDataHigh << 8) | pixelDataLow;
-  }
-
-  i2c_stop();
-}
 
 //Read the compensation pixel 16 bit data
 int readCPIX_MLX90620()
@@ -202,35 +164,9 @@ int readCPIX_MLX90620()
   return ( (int)(cpixHigh << 8) | cpixLow);
 }
 
-//Reads the current configuration register (2 bytes) from the MLX
-//Returns two bytes
-unsigned int readConfig_MLX90620()
-{
-  i2c_start_wait(MLX90620_WRITE); //The MLX configuration is in the MLX, not EEPROM
-  i2c_write(CMD_READ_REGISTER); //Command = read configuration register
-  i2c_write(0x92); //Start address
-  i2c_write(0x00); //Address step of zero
-  i2c_write(0x01); //Number of reads is 1
 
-    i2c_rep_start(MLX90620_READ);
 
-  byte configLow = i2c_readAck(); //Grab the two bytes
-  byte configHigh = i2c_readAck();
 
-  i2c_stop();
-
-  return( (unsigned int)(configHigh << 8) | configLow); //Combine the configuration bytes and return as one unsigned int
-}
-
-//Poll the MLX for its current status
-//Returns true if the POR/Brown out bit is set
-boolean checkConfig_MLX90620()
-{
-  if ( (readConfig_MLX90620() & (unsigned int)1<<POR_TEST) == 0)
-    return true;
-  else
-    return false;
-}
 
 //Prints the temperatures in a way that's more easily viewable in the terminal window
 void prettyPrintTemperatures()
@@ -265,3 +201,5 @@ float convertToFahrenheit (float Tc)
 
   return(Tf);
 }
+
+

@@ -7,7 +7,8 @@
 #define DEFAULT_REFRESH_RATE	16	//I Don't know what kind of refesh rate it is -_-
 
 Mlx90620::Mlx90620()
-	:	mRefreshRate	(DEFAULT_REFRESH_RATE)
+	:	lastPorCheckTime	(0UL),
+		mRefreshRate	(DEFAULT_REFRESH_RATE)
 {
 
 }
@@ -20,22 +21,17 @@ void Mlx90620::init()
 
 
 	initReadWholeEeprom();
+	initCalculateAlpha();
 	initCalibrationData();
 	initWriteOscillatorTrimmingValue();
 	writeConfigurationRegister();
+	calculateTa();
+}
 
-
-	while (true)
-	{
-		calculateTa();
-
-		Serial.println(readPTAT_MLX90620());
-		Serial.println(mTa);
-		Serial.println();
-		delay(500);
-	}
-	
-
+double Mlx90620::getTemperatureAmbient()
+{
+	calculateTa();
+	return mTa;
 }
 
 
@@ -69,6 +65,7 @@ void Mlx90620::printEeprom()
 		Serial.print(mEepromData[i], HEX);
 		Serial.print(" ");
 	}
+	Serial.println();
 }
 
 
@@ -160,6 +157,19 @@ int16_t Mlx90620::readS16FromEepromData(uint8_t lsb)
 	return ret;
 }
 
+uint16_t Mlx90620::readU16FromEepromData(uint8_t lsb)
+{
+	uint16_t ret = mEepromData[lsb+1];
+	ret <<= 8;
+	ret |= mEepromData[lsb];
+	return ret;
+}
+
+uint8_t Mlx90620::readU8FromEepromData(uint8_t address)
+{
+	return (uint8_t)mEepromData[address];
+}
+
 void Mlx90620::initCalibrationData()
 {
 	mVTH = readS16FromEepromData(MLX_EEPROM_VTH_L);
@@ -192,5 +202,109 @@ void Mlx90620::calculateTa()
 	temp += 25.0;
 
 	mTa = temp;
-	//mTa = (sqrt(mKT1*mKT1-4*mKT2*(mVTH-(float)ptat)) - mKT1) / 2.0 / mKT2 + 25.0;
+}
+
+
+void Mlx90620::getFirArray()
+{
+	// check por
+	if (millis() - lastPorCheckTime > POR_CHECK_TIMEOUT)
+	{
+		//1. update Temperature Ambient
+		calculateTa();
+		//2. check POR
+		if (isPor())
+		{
+			//set POR/Brown-Out to 1 P11 on Datashit
+			writeConfigurationRegister();
+		}
+		//3. update time
+		lastPorCheckTime = millis();
+	}
+
+	readIrData();
+
+}
+
+//Reads the current configuration register (2 bytes) from the MLX
+//Returns two bytes
+uint16_t Mlx90620::readConfigurationRegister()
+{
+  i2c_start_wait(MLX90620_WRITE); //The MLX configuration is in the MLX, not EEPROM
+  i2c_write(CMD_READ_REGISTER); //Command = read configuration register
+  i2c_write(0x92); //Start address
+  i2c_write(0x00); //Address step of zero
+  i2c_write(0x01); //Number of reads is 1
+
+  i2c_rep_start(MLX90620_READ);
+
+  byte configLow = i2c_readAck(); //Grab the two bytes
+  byte configHigh = i2c_readAck();
+
+  i2c_stop();
+
+  return( (uint16_t)(configHigh << 8) | configLow); //Combine the configuration bytes and return as one unsigned int
+}
+
+
+//Poll the MLX for its current status
+//Returns true if the POR/Brown out bit is set
+bool Mlx90620::isPor()
+{
+	return ( (readConfigurationRegister()&(uint16_t)1<<POR_TEST) == 0);
+}
+
+//Reads 64 bytes of pixel data from the MLX
+//Loads the data into the irData array
+void Mlx90620::readIrData()
+{
+	//read whole frame, P12 on Datashit
+	i2c_start_wait(MLX90620_WRITE);
+	i2c_write(CMD_READ_REGISTER); //Command = read a register
+	i2c_write(0x00); //Start address = 0x00
+	i2c_write(0x01); //Address step = 1
+	i2c_write(0x40); //Number of reads is 64
+	i2c_rep_start(MLX90620_READ);
+
+	for(int i = 0 ; i < 64 ; i++)
+	{
+		byte pixelDataLow = i2c_readAck();
+		byte pixelDataHigh = i2c_readAck();
+		mIrData[i] = (int)(pixelDataHigh << 8) | pixelDataLow;
+	}
+
+	i2c_stop();
+}
+
+void Mlx90620::initCalculateAlpha()
+{
+	uint16_t alpha0 = readU16FromEepromData(MLX_EEPROM_CAL_A0_L);
+	uint8_t alpha0scale = readU8FromEepromData(MLX_EEPROM_CAL_A0_SCALE);
+	uint8_t deltaAlphaScale = readU8FromEepromData(MLX_EEPROM_CAL_DELTA_A_SCALE);
+
+	double commonItem = (double)alpha0 / (pow(2.0, alpha0scale));
+
+	int i, j;
+	for (j=0; j<16; ++j)
+	{
+		for (i=0; i<4; ++i)
+		{
+			double deltaAlpha = readU8FromEepromData(0x80 + j*4 + i);
+			mAlpha[i][j] = commonItem + (deltaAlpha / pow(2.0, deltaAlphaScale));
+		}
+	}
+}
+
+void Mlx90620::printAlpha()
+{
+	int i, j;
+	for (i=0; i<4; ++i)
+	{
+		for (j=0; j<16; ++j)
+		{
+			Serial.print(mAlpha[i][j], 20);
+			Serial.print("\t");
+		}
+		Serial.println();
+	}
 }

@@ -53,3 +53,11 @@
 #define MLX_EEPROM_KT1_H 0xDD
 #define MLX_EEPROM_KT2_L 0xDE
 #define MLX_EEPROM_KT2_H 0xDF
+
+//Common sensitivity coefficients
+#define MLX_EEPROM_CAL_A0_L 0xE0
+#define MLX_EEPROM_CAL_A0_H 0xE1
+#define MLX_EEPROM_CAL_A0_SCALE 0xE2
+#define MLX_EEPROM_CAL_DELTA_A_SCALE 0xE3
+#define MLX_EEPROM_CAL_EMIS_L 0xE4
+#define MLX_EEPROM_CAL_EMIS_H 0xE5
