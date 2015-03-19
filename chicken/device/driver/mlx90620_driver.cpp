@@ -20,6 +20,11 @@ void *readMlxDataFromSerialThread(void *mlx90620DriverPtr)
 
 }
 
+union ByteFloat
+{
+	float value;
+	uint8_t byte[4];
+};
 
 
 Mlx90620Driver::Mlx90620Driver(Io *io, char *serialPath)
@@ -67,10 +72,23 @@ void Mlx90620Driver::updateData(void)
 void Mlx90620Driver::decodePayload(const uint8_t *buffer, int length)
 {
 	int i;
-	for (i=0; i<length; ++i)
+	int type = (int)buffer[0];
+	ByteFloat byteFloat;
+	if (type == 1)
 	{
-		cout<<hex<<(unsigned int)buffer[i]<<dec<<" ";
+		double halfArray[16*2];
+		for (i=0; i<32; ++i)
+		{
+			byteFloat.byte[0] = buffer[i*4+1];
+			byteFloat.byte[1] = buffer[i*4+2];
+			byteFloat.byte[2] = buffer[i*4+3];
+			byteFloat.byte[3] = buffer[i*4+4];
+			halfArray[i] = byteFloat.value;
+
+			cout<<halfArray[i]<<" ";
+		}
 	}
+
 	cout<<endl;
 }
 
