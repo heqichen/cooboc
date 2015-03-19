@@ -1,0 +1,1 @@
+./chicken /tmp/test.json
