@@ -13,7 +13,7 @@ SaModem::SaModem()
 		mPayloadSize	(0),
 		lastDecodeTime	(0UL)
 {
-cout<<"mIsPacketLocked: "<<mIsPacketLocked<<endl;
+//cout<<"mIsPacketLocked: "<<mIsPacketLocked<<endl;
 }
 
 SaModem::~SaModem()
@@ -46,7 +46,7 @@ bool SaModem::demodulateByte(uint8_t byte)
 
 		if (millis() - lastTime > SA_PACKET_TIMEOUT)
 		{
-			cout<<"timeout, locked failed"<<endl;
+			//cout<<"timeout, locked failed"<<endl;
 			resetStatus();
 			return false;
 		}
@@ -65,7 +65,7 @@ bool SaModem::demodulateByte(uint8_t byte)
 			{
 				if (byte == SA_CHECK_BYTE)
 				{
-					cout<<"check byte found, move packet id to 2"<<endl;
+					//cout<<"check byte found, move packet id to 2"<<endl;
 					mPacketIndex = 2;
 					return false;
 				}
@@ -79,7 +79,7 @@ bool SaModem::demodulateByte(uint8_t byte)
 				{
 					mPacketIndex = 4;
 				}
-				cout<<"read payload length is " << mPayloadSize<<endl;
+				//cout<<"read payload length is " << mPayloadSize<<endl;
 				return false;
 			}
 			case (3):
@@ -89,7 +89,7 @@ bool SaModem::demodulateByte(uint8_t byte)
 				mPayloadIndex++;
 				if (mPayloadIndex == mPayloadSize)
 				{
-					cout<<"read payload finish, move to packetIndex: 4"<<endl;
+					//cout<<"read payload finish, move to packetIndex: 4"<<endl;
 					mPacketIndex++;
 				}
 				return false;
@@ -111,8 +111,8 @@ bool SaModem::demodulateByte(uint8_t byte)
 				}
 				else
 				{
-					cout<<"crc check failed"<<endl;
-					cout<<"expected: "<<hex<<(int)crcCalculated<<"  actually: "<<(int)crcInPacket<<dec<<endl;
+					//cout<<"crc check failed"<<endl;
+					//cout<<"expected: "<<hex<<(int)crcCalculated<<"  actually: "<<(int)crcInPacket<<dec<<endl;
 					resetStatus();
 					return false;
 				}

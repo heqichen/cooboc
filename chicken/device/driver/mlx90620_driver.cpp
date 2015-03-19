@@ -16,17 +16,6 @@ void *readMlxDataFromSerialThread(void *mlx90620DriverPtr)
 	while (mlx->isRunning())
 	{
 		mlx->updateData();
-		/*
-		usleep(1000UL);
-		while (true)
-		{
-			if (millis() % MLX_READ_INTERVAL == 0)
-			{
-				break;
-			}
-			usleep(300UL);
-		}
-		*/
 	}
 
 }
@@ -60,29 +49,18 @@ void Mlx90620Driver::updateData(void)
 	uint8_t buffer[1024];
 	uint8_t payloadBuffer[1024];
 	int numRead = 0;
-	int readLoopCount = 0;
-	do
-	{
-		++readLoopCount;
-		numRead = mSerialHandler->recv(buffer, 1024);
-		int i;
+	numRead = mSerialHandler->recv(buffer, 1024);
+	int i;
 
-		for (i=0; i<numRead; ++i)
+	for (i=0; i<numRead; ++i)
+	{
+		if (mModem.demodulateByte(buffer[i]))
 		{
-			//cout<< hex << (int)buffer[i]<< dec << " ";
-			if (mModem.demodulateByte(buffer[i]))
-			{
-				cout<<endl<<"got packet"<<endl<<endl;
-			}
-			/*
-			if (mModem.demodulateByte(buffer[i]))
-			{
-				int payloadSize = mModem.getLastPayload(payloadBuffer);
-				decodePayload(payloadBuffer, payloadSize);
-			}
-			*/
+			cout<<endl<<"got packet"<<endl<<endl;
+			int payloadSize = mModem.getLastPayload(payloadBuffer);
+			decodePayload(payloadBuffer, payloadSize);
 		}
-	} while (numRead > 0);
+	}
 }
 
 
