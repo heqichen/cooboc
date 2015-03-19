@@ -10,6 +10,8 @@ double thermalArray[4][16];
 
 uint8_t sendBuffer[256];
 
+void emitData(uint8_t *data, int length);
+
 void setup()
 {
 	Serial.begin(9600);
@@ -45,6 +47,7 @@ void loop()
 
 void emitData(uint8_t *data, int length)
 {
+	Serial.write('D');	//write some dummy bytes for starting uart communication
 	Serial.write('S');
 	Serial.write('A');
 	uint8_t crc = 0x00;
