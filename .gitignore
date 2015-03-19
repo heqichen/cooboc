@@ -4,6 +4,9 @@ chicken/chicken
 *.xml~
 node_modules/
 
+# Arduino Bulid Cli
+build-cli
+
 # Ctags plugin created files #
 .tags*
 
