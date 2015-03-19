@@ -1,0 +1,86 @@
+<html>
+	<head>
+		<title>Head Position Detect for Faurecia</title>
+		<script src="/static/jquery-1.11.2.min.js"></script>
+<script>
+
+
+var map = function(x, in_min, in_max, out_min, out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+var constraint = function(x, in_min, in_max) {
+	if (x < in_min) {
+		x = in_min;
+	}
+	if (x > in_max) {
+		x = in_max;
+	}
+	return x;
+}
+
+
+$(document).ready(function() {
+	var firCell = [];
+	var x, y;
+	for (y=0; y<4; ++y) {
+		for (x=0; x<16; ++x)
+		{
+			firCell[y*16 + x] = $("<div>", {"id":"fir_cell_" + Number(y*16+x),"class":"fir_cell" })
+				.offset({"top": Number(y*50), "left": Number(x*100)})
+				.appendTo($("#wrapper"));
+		}
+	}
+
+
+	var onNewFirArray = function(data, textStatus, jqXHR) {
+		//alert(data.firArray);
+		var i;
+		for (i=0; i<64; ++i)
+		{
+			firCell[i].text(data.firArray[i]);
+			r = map(data.firArray[i], 15.0, 40.0, 0.0, 255.0);
+			r = constraint(r, 0, 255);
+			g = 0.0;
+			b = map(data.firArray[i], 15.0, 40.0, 255.0, 0.0);
+			b = constraint(b, 0, 255);
+
+			firCell[i].css("background-color", "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")");
+
+		}
+	};
+
+	var updateData = function() {
+		$.ajax({
+			url: "/getFirArray", 
+			dataType: "json", 
+			method: "GET", 
+			success: onNewFirArray
+		});
+	};
+
+	setInterval(updateData, 1000);
+
+});
+</script>
+<style>
+#wrapper
+{
+	position:	relative;
+	width:	1600px;
+	height:	200px;
+}
+
+.fir_cell
+{
+	position: absolute;
+	width:	100px;
+	height:	50px;
+	display: block;
+}
+</style>
+	</head>
+	<body>
+		<div id="wrapper">&nbsp;</div>
+	</body>
+</html>
