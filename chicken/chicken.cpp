@@ -81,6 +81,8 @@ int main(int argc, char *argv[])
 */
 	thermalArray->test();
 
+	int a;
+	cin>>a;
 
 	return 0;
 }
