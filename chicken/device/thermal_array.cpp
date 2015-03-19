@@ -36,8 +36,6 @@ void ThermalArray::init()
 void ThermalArray::test()
 {
 
-	usleep(10000UL);
-	cout<<"Hello World!"<<endl;
 
 
 }

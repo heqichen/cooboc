@@ -1,11 +1,9 @@
 #ifndef __MLX90620_DRIVER_H__
 #define __MLX90620_DRIVER_H__
 
-
-
-
 #include "io/io.h"
 
+#include <utils/sa_modem.h>
 
 #include <pthread.h>
 
@@ -26,6 +24,10 @@ class Mlx90620Driver
 		SerialHandler *mSerialHandler;
 		bool mIsRunning;
 		pthread_t mUpdatePthread;
+		SaModem mModem;
+
+
+		void decodePayload(const uint8_t *buffer, int length);
 };
 
 
