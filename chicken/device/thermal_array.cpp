@@ -33,10 +33,7 @@ void ThermalArray::init()
 }
 
 
-void ThermalArray::test()
+const double *const ThermalArray::getFirArray()
 {
-
-
-
+	return mMlx90620->getFirArray();
 }
-

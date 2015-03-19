@@ -15,17 +15,18 @@ class Mlx90620Driver
 {
 
 	public:
-		Mlx90620Driver(Io *io, char *serialPath);
+		Mlx90620Driver(Io *io, const char *serialPath);
 		~Mlx90620Driver();
 		void updateData(void);
 		inline bool isRunning() const {return mIsRunning;}
-
+		const double * const getFirArray();
 	private:
 		SerialHandler *mSerialHandler;
 		bool mIsRunning;
 		pthread_t mUpdatePthread;
 		SaModem mModem;
 
+		double mFirArray[64];
 
 		void decodePayload(const uint8_t *buffer, int length);
 };

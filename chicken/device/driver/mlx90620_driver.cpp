@@ -27,7 +27,7 @@ union ByteFloat
 };
 
 
-Mlx90620Driver::Mlx90620Driver(Io *io, char *serialPath)
+Mlx90620Driver::Mlx90620Driver(Io *io, const char *serialPath)
 	:	mSerialHandler	(NULL),
 		mIsRunning		(false)
 {
@@ -61,7 +61,6 @@ void Mlx90620Driver::updateData(void)
 	{
 		if (mModem.demodulateByte(buffer[i]))
 		{
-			cout<<endl<<"got packet"<<endl<<endl;
 			int payloadSize = mModem.getLastPayload(payloadBuffer);
 			decodePayload(payloadBuffer, payloadSize);
 		}
@@ -74,9 +73,9 @@ void Mlx90620Driver::decodePayload(const uint8_t *buffer, int length)
 	int i;
 	int type = (int)buffer[0];
 	ByteFloat byteFloat;
-	if (type == 1)
+	double halfArray[16*2];
+	if (type==1 || type==2)
 	{
-		double halfArray[16*2];
 		for (i=0; i<32; ++i)
 		{
 			byteFloat.byte[0] = buffer[i*4+1];
@@ -84,14 +83,38 @@ void Mlx90620Driver::decodePayload(const uint8_t *buffer, int length)
 			byteFloat.byte[2] = buffer[i*4+3];
 			byteFloat.byte[3] = buffer[i*4+4];
 			halfArray[i] = byteFloat.value;
-
-			cout<<halfArray[i]<<" ";
 		}
 	}
 
-	cout<<endl;
+	switch (type)
+	{
+		case (1):
+		{
+			for (i=0; i<32; ++i)
+			{
+				mFirArray[i] = halfArray[i];
+			}
+			break;
+		}
+		case (2):
+		{
+			for (i=0; i<32; ++i)
+			{
+				mFirArray[32+i] = halfArray[i];
+			}
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+
 }
 
-
+const double * const Mlx90620Driver::getFirArray()
+{
+	return mFirArray;
+}
 
 

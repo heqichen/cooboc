@@ -15,8 +15,7 @@ class ThermalArray	:	public IDevice
 		ThermalArray(Io *io);
 		~ThermalArray();
 		virtual void init();
-
-		void test();
+		const double *const getFirArray();
 	private:
 		Mlx90620Driver *mMlx90620;
 };
