@@ -50,6 +50,7 @@ void emitData(uint8_t *data, int length)
 	Serial.write('D');	//write some dummy bytes for starting uart communication
 	Serial.write('S');
 	Serial.write('A');
+	Serial.write((unsigned char)length);
 	uint8_t crc = 0x00;
 	int i;
 	for (i=0; i<length; ++i)
