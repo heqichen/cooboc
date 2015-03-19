@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	
 		const double * const firArray = thermalArray->getFirArray();
 		int i, j;
-
+/*
 		for (i=0; i<4; ++i)
 		{
 			for (j=0; j<16; ++j)
@@ -67,9 +67,9 @@ int main(int argc, char *argv[])
 			cout<<endl;
 		}
 		cout<<endl;
-
+*/
 		ofstream file;
-		file.open("test.txt", ofstream::out | ofstream::trunc);
+		file.open(fileName, ofstream::out | ofstream::trunc);
 		file<<"{\"firArray\":[";
 		for (i=0; i<63; ++i)
 		{
