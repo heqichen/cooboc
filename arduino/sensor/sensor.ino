@@ -14,10 +14,20 @@ void emitData(uint8_t *data, int length);
 
 void setup()
 {
-	Serial.begin(9600);
+	Serial.begin(57600);
 	mlx.init();
-	//mlx.printEeprom();
-	//mlx.printAlpha();
+	mlx.printEeprom();
+	mlx.printAlpha();
+}
+
+void testLoop()
+{
+	int i;
+	for (i=0; i<256; ++i)
+	{
+		Serial.write((uint8_t)0);
+	}
+	delay(1000);
 }
 
 void loop()
@@ -47,7 +57,7 @@ void loop()
 
 void emitData(uint8_t *data, int length)
 {
-	Serial.write('D');	//write some dummy bytes for starting uart communication
+	Serial.print("Dummy");	//write some dummy bytes for starting uart communication
 	Serial.write('S');
 	Serial.write('A');
 	Serial.write((unsigned char)length);
