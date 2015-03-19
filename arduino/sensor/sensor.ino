@@ -52,12 +52,37 @@ void loop()
 	}
 	emitData(sendBuffer, 2*16*4+1);
 
-	delay(1000);
+
+
+
+	sendBuffer[0] = 0x02;
+
+	for (i=2; i<4; ++i)
+	{
+		for (j=0; j<16; ++j)
+		{
+			uint8_t *doubleBuffer;
+			doubleBuffer = (uint8_t *)((void *)(thermalArray[i]+j));
+			for (k=0; k<4; ++k)
+			{
+				sendBuffer[1 + i*16*4 + j*4 + k] = doubleBuffer[k];
+			}
+		}
+	}
+	emitData(sendBuffer, 2*16*4+1);
+			
+
+
+
+
+
+
+	delay(100);
 }
 
 void emitData(uint8_t *data, int length)
 {
-	Serial.print("Dummy");	//write some dummy bytes for starting uart communication
+//	Serial.print("Dummy");	//write some dummy bytes for starting uart communication
 	Serial.write('S');
 	Serial.write('A');
 	Serial.write((unsigned char)length);
