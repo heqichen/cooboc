@@ -7,6 +7,7 @@
 
 var lowTemp = 15.0;
 var highTemp = 40.0;
+var threshold = 30.0;
 
 var map = function(x, in_min, in_max, out_min, out_max) {
 	x = parseFloat(x);
@@ -30,6 +31,7 @@ var constraint = function(x, in_min, in_max) {
 
 $(document).ready(function() {
 	var firCell = [];
+	var filteredCell = [];
 	var x, y;
 	for (y=0; y<4; ++y) {
 		for (x=0; x<16; ++x)
@@ -37,6 +39,9 @@ $(document).ready(function() {
 			firCell[y*16 + x] = $("<div>", {"id":"fir_cell_" + Number(y*16+x),"class":"fir_cell" })
 				.offset({"top": Number(y*50), "left": Number(x*100)})
 				.appendTo($("#wrapper"));
+			filteredCell[y*16 + x] = $("<div>", {"id":"filtered_cell_" + Number(y*16+x),"class":"fir_cell" })
+				.offset({"top": Number(y*50), "left": Number(x*100)})
+				.appendTo($("#filtered_wrapper"));
 		}
 	}
 
@@ -46,13 +51,16 @@ $(document).ready(function() {
 	$("#highTemp").on("change", function(){
 		highTemp = $("#highTemp").val();
 	});
+	$("#threshold").on("change", function() {
+		threshold = $("#threshold").val();
+		$("#threshold-text").text(threshold);
+	});
 
 
 	var onNewFirArray = function(data, textStatus, jqXHR) {
 		//alert(data.firArray);
 		var i;
-		for (i=0; i<64; ++i)
-		{
+		for (i=0; i<64; ++i) {
 			firCell[i].text(data.firArray[i]);
 			r = map(data.firArray[i], lowTemp, highTemp, 0.0, 255.0);
 			r = constraint(r, 0, 255);
@@ -61,6 +69,12 @@ $(document).ready(function() {
 			b = constraint(b, 0, 255);
 
 			firCell[i].css("background-color", "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")");
+
+			if (data.firArray[i] > threshold) {
+				filteredCell[i].css("background-color", "white");
+			} else {
+				filteredCell[i].css("background-color", "gray");
+			}
 
 		}
 	};
@@ -87,6 +101,14 @@ $(document).ready(function() {
 	display:	inline-block;
 }
 
+#filtered_wrapper
+{
+	position:	relative;
+	width:	1600px;
+	height:	200px;
+	display:	inline-block;
+}
+
 .fir_cell
 {
 	position: absolute;
@@ -97,12 +119,18 @@ $(document).ready(function() {
 	font-weight: bold;
 	color:	white;
 }
+
+
 </style>
 	</head>
 	<body>
 		<div id="wrapper">&nbsp;</div> <br />
 		<div id="control_panel">
-			Low Temperature: <input type="text" value="15.0" id="lowTemp"/>, High Temperature: <input type="text" value="40.0" id="highTemp"/>
-		</div>
+			Low Temperature: <input type="text" value="15.0" id="lowTemp"/>, High Temperature: <input type="text" value="40.0" id="highTemp"/> <br />
+			Threshold: <input type="range" id="threshold" value="30.0" min="20" max="35" step="0.1" for="threshold-text"/><span id="threshold-text">30.0</span><br />
+
+
+		</div><br />
+		<div id="filtered_wrapper">&nbsp;</div>
 	</body>
 </html>
