@@ -33,6 +33,7 @@ ThermalArray *thermalArray;
 
 
 void setupDevice(void);
+void printFirArray(const double * const firArray);
 
 int main(int argc, char *argv[])
 {
@@ -56,18 +57,12 @@ int main(int argc, char *argv[])
 		usleep(200000UL);
 	
 		const double * const firArray = thermalArray->getFirArray();
+		printFirArray(firArray);
+
 		int i, j;
-/*
-		for (i=0; i<4; ++i)
-		{
-			for (j=0; j<16; ++j)
-			{
-				cout<<firArray[i*16 + j]<<"\t";
-			}
-			cout<<endl;
-		}
-		cout<<endl;
-*/
+
+
+
 		ofstream file;
 		file.open(fileName, ofstream::out | ofstream::trunc);
 		file<<"{\"firArray\":[";
@@ -81,6 +76,20 @@ int main(int argc, char *argv[])
 
 	}
 	return 0;
+}
+
+void printFirArray(const double * const firArray)
+{
+	int i, j;
+	for (i=0; i<4; ++i)
+	{
+		for (j=0; j<16; ++j)
+		{
+			cout<<firArray[i*16 + j]<<"\t";
+		}
+		cout<<endl;
+	}
+	cout<<endl;
 }
 
 void setupDevice(void)

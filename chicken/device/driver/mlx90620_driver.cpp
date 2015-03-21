@@ -90,18 +90,24 @@ void Mlx90620Driver::decodePayload(const uint8_t *buffer, int length)
 	{
 		case (1):
 		{
+			//cout<<"from 0x01 frame: ";
 			for (i=0; i<32; ++i)
 			{
 				mFirArray[i] = halfArray[i];
+				//cout<<halfArray[i]<<"\t";
 			}
+			//cout<<endl;
 			break;
 		}
 		case (2):
 		{
+			//cout<<"from 0x02 frame: ";
 			for (i=0; i<32; ++i)
 			{
+				//cout<<halfArray[i]<<"\t";
 				mFirArray[32+i] = halfArray[i];
 			}
+			//cout<<endl;
 			break;
 		}
 		default:

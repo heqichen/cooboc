@@ -65,7 +65,7 @@ void loop()
 			doubleBuffer = (uint8_t *)((void *)(thermalArray[i]+j));
 			for (k=0; k<4; ++k)
 			{
-				sendBuffer[1 + i*16*4 + j*4 + k] = doubleBuffer[k];
+				sendBuffer[1 + i*16*4 - 128 + j*4 + k] = doubleBuffer[k];
 			}
 		}
 	}
