@@ -34,6 +34,7 @@ ServoController *servoController;
 Aoa *aoa;
 Beeper *beeper;
 Agl *agl;
+Hr *hr;
 
 VirtualImu *virtualImu;
 ADI *adi;
@@ -53,6 +54,7 @@ void setupController(void);
 //application specific
 void faurecia(void);
 void setupDeviceForFaurecia(void);
+void workForFaurecia(void);
 
 int main(int argc, char *argv[])
 {
@@ -73,12 +75,20 @@ int main(int argc, char *argv[])
 void faurecia()
 {
 	setupDeviceForFaurecia();
+	workForFaurecia();
 }
 
 void setupDeviceForFaurecia()
 {
 	io = new Io();
 	devManager = new DeviceManager(io);
+
+	hr = devManager->getHr();
+}
+
+void workForFaurecia()
+{
+	hr->test();
 }
 
 void setupController()

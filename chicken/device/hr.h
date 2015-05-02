@@ -4,6 +4,11 @@
 //Head Rest
 
 #include "i_device.h"
+#include "driver/hr_driver.h"
+
+#ifndef NULL
+#define NULL 0
+#endif
 
 
 class Hr	:	public IDevice
@@ -12,8 +17,10 @@ class Hr	:	public IDevice
 		Hr(Io *io);
 		~Hr();
 		virtual void init();
-	private:
 
+		void test();
+	private:
+		HrDriver *mHrDriver;
 };
 
 #endif
