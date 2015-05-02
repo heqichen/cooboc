@@ -13,11 +13,15 @@
 #include "navigator/attitude_navigator.h"
 #include "navigator/manully_navigator.h"
 
+#include "utils/libconfig/libconfig.h++"
+using namespace libconfig;
+
 #include <mavlink.h>
 
 #include <iostream>
 #include <utils/util.h>
 #include <unistd.h>
+
 
 using namespace std;
 
@@ -43,11 +47,42 @@ AttitudeNavigator *attitudeNavigator;
 
 
 void setupDevice(void);
+void setupController(void);
+
+//application specific
+void faurecia(void);
+void setupDeviceForFaurecia(void);
 
 int main(int argc, char *argv[])
 {
-	setupDevice();
+	Config config;
+	config.readFile("chicken.cfg");
+	string application = config.lookup("application");
+	cout<<application<<endl;
+	//setupDevice();
+	//setupController();
 
+	if (application == string("faurecia-hr"))
+	{
+		faurecia();
+	}
+	return 0;
+}
+
+
+void faurecia()
+{
+	setupDeviceForFaurecia();
+}
+
+void setupDeviceForFaurecia()
+{
+	io = new Io();
+	devManager = new DeviceManager(io);
+}
+
+void setupController()
+{
 	adi = new ADI(imu);
 	adi->setVirtualImu(virtualImu);
 
@@ -81,7 +116,6 @@ int main(int argc, char *argv[])
 		cin>>p>>i>>d;
 		attitudeController->setTunning(p, i, d);
 	}
-	return 0;
 }
 
 void setupDevice(void)
