@@ -89,6 +89,8 @@ void setupDeviceForFaurecia()
 void workForFaurecia()
 {
 	hr->test();
+	int a;
+	cin>>a;
 }
 
 void setupController()

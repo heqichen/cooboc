@@ -23,11 +23,12 @@ SerialHandler::SerialHandler(const char *portName)
 {
 	int portNameLen = strlen(portName);
 	mPortName = new char[portNameLen+1];
-	strncpy(mPortName, portName, portNameLen);
+	strncpy(mPortName, portName, portNameLen+1);
+
+
 	mTtyFile = open(mPortName, O_RDWR | O_NOCTTY | O_NDELAY);
 
-	fcntl(mTtyFile, F_SETFL, FNDELAY);
-
+	int retno = fcntl(mTtyFile, F_SETFL, FNDELAY);
 	termios options;
 	tcgetattr(mTtyFile, &options);
 

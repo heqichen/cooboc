@@ -25,5 +25,4 @@ void Hr::init()
 
 void Hr::test()
 {
-	mHrDriver->test();
 }

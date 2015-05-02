@@ -19,7 +19,7 @@ IicHandler::IicHandler(const char *portName)
 {
 	int portNameLen = strlen(portName);
 	mPortName = new char[portNameLen+1];
-	strncpy(mPortName, portName, portNameLen);
+	strncpy(mPortName, portName, portNameLen+1);
 	mI2cFile = open(mPortName, O_RDWR);
 	pthread_mutex_init(&mMutex, NULL);
 }

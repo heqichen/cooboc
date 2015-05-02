@@ -12,7 +12,7 @@ GpioHandler::GpioHandler(const char *gpioKey)
 
 	int len = strlen(gpioKey);
 	mGpioKey = new char [len+1];
-	strncpy(mGpioKey, gpioKey, len);
+	strncpy(mGpioKey, gpioKey, len+1);
 
 	mGpioManager = GPIO::GPIOManager::getInstance();
 	mGpioPin = GPIO::GPIOConst::getInstance()->getGpioByKey(mGpioKey);

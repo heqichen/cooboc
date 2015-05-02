@@ -15,9 +15,14 @@ class HrDriver
 		HrDriver(Io *io);
 		~HrDriver();
 
-		void test();
+		inline bool isReadingThreadRunning() const {return mIsReadThreadRunning;}
+
+		void readData();
 	private:
 		SerialHandler *mSerialHandler;
+		bool mIsReadThreadRunning;
+		pthread_t mReadThread;
+		uint8_t mReadBuffer[1024];
 
 		
 };
