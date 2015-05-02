@@ -5,9 +5,35 @@ void setup()
 
 void loop()
 {
-	Serial.println(analogRead(A0));
-	Serial.println(analogRead(A1));
-	Serial.println();
+	Serial.write('S');
+	Serial.write('A');
+	Serial.write(4);
+	unsigned int a;
+	unsigned char b;
+	unsigned char crc;
 
-	delay(200);
+	a = analogRead(A0);
+	b = (unsigned char)(a & 0xFF);
+	crc = b;
+	Serial.write(b);
+	a >>= 8;
+	b = (unsigned char)(a & 0xFF);
+	crc ^= b;
+	Serial.write(b);
+
+	a = analogRead(A1);
+	b = (unsigned char)(a & 0xFF);
+	crc ^= b;
+	Serial.write(b);
+	a >>= 8;
+	b = (unsigned char)(a & 0xFF);
+	crc ^= b;
+	Serial.write(b);
+
+	Serial.write(crc);
+
+	Serial.write('\r');
+	Serial.write('\n');
+
+	delay(20);
 }
