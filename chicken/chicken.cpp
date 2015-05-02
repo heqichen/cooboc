@@ -6,6 +6,7 @@
 #include "./device/aoa.h"
 #include "./device/beeper.h"
 #include "./device/virtual_imu.h"
+#include "./device/hr.h"
 #include "./instruments/adi.h"
 #include "status_controller.h"
 #include "attitude_controller.h"
@@ -35,8 +36,8 @@ Beeper *beeper;
 Agl *agl;
 
 VirtualImu *virtualImu;
-
 ADI *adi;
+
 
 
 StatusController *statusController;
@@ -58,7 +59,6 @@ int main(int argc, char *argv[])
 	Config config;
 	config.readFile("chicken.cfg");
 	string application = config.lookup("application");
-	cout<<application<<endl;
 	//setupDevice();
 	//setupController();
 

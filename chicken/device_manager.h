@@ -14,6 +14,7 @@
 #include "./device/beeper.h"
 #include "./device/agl.h"
 #include "./device/virtual_imu.h"
+#include "./device/hr.h"
 
 #define MAX_DEVICES_IN_CHICKEN 256
 
@@ -28,7 +29,7 @@ class DeviceManager
 		Aoa *getAoa(void);
 		Beeper *getBeeper(void);
 		Agl *getAgl(void);
-
+		Hr *getHr(void);
 		VirtualImu *getVirtualImu(void);
 	private:
 		Io *mIo;
