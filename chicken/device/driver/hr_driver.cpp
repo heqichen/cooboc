@@ -32,9 +32,30 @@ HrDriver::~HrDriver()
 
 void HrDriver::readData()
 {
+	int i;
+	int a0, a1;
+#warning "current length of packet from hr sensor is 4"
+
 	int length = mSerialHandler->recv(mReadBuffer,1024);
-	cout<<"read " << length <<endl;
+	for (i=0; i<length; ++i)
+	{
+		if (mSaModem.demodulateByte(mReadBuffer[i]))
+		{
+			mSaModem.getLastPayload(mReadDataBuffer);
+			a0 = mReadDataBuffer[1];
+			a0 <<= 8;
+			a0 |= mReadDataBuffer[0];
+
+			a1 = mReadDataBuffer[3];
+			a1 <<= 8;
+			a1 |= mReadDataBuffer[2];
+
+			cout<<a0<<" , "<<a1<<endl;
+		}
+	}
+
+	//cout<<"read " << length <<endl;
 	
-	usleep(1000000UL);
+	usleep(10000UL);
 }
 

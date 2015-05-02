@@ -4,6 +4,8 @@
 #include "io/io.h"
 #include "io/serial_handler.h"
 
+#include <utils/sa_modem.h>
+
 
 #ifndef NULL
 #define NULL 0
@@ -23,7 +25,8 @@ class HrDriver
 		bool mIsReadThreadRunning;
 		pthread_t mReadThread;
 		uint8_t mReadBuffer[1024];
-
+		uint8_t mReadDataBuffer[1024];
+		SaModem mSaModem;
 		
 };
 
