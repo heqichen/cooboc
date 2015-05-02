@@ -1,6 +1,6 @@
 IDIR = ../../
 CC=g++
-CFLAGS=-I$(IDIR) -I../../inc/mavlink/common/
+CFLAGS=-I$(IDIR) -I../../../inc/mavlink/common/
 COMPILE.cc = $(CC) -c -g $(CFLAGS)
 
 OBJS = serial_radio_driver.o bmx055_driver.o serial_servo_driver.o ads7828_driver.o beeper_driver.o

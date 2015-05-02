@@ -1,6 +1,6 @@
 IDIR = ../
 CC=g++
-CFLAGS=-I$(IDIR) -I../inc/mavlink/common
+CFLAGS=-I$(IDIR) -I../../inc/mavlink/common
 COMPILE.cc = $(CC) -c -g $(CFLAGS)
 
 OBJS = radio.o i_device.o imu.o servo_controller.o aoa.o beeper.o agl.o virtual_imu.o

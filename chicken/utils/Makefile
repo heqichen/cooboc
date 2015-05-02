@@ -1,6 +1,6 @@
 IDIR = ../
 CC=g++
-CFLAGS=-I$(IDIR) -I../inc/mavlink/common
+CFLAGS=-I$(IDIR) -I../../inc/mavlink/common
 COMPILE.cc = $(CC) -c -g $(CFLAGS)
 
 OBJS = filter.o fol_filter.o util.o mavlink_wtf.o i_interval_thread.o pid.o avg_filter.o sa_modem.o
