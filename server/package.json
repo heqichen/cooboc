@@ -1,0 +1,18 @@
+{
+  "name": "ShowFirArray",
+  "version": "0.0.0",
+  "description": "show fir array in html",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js 8173"
+  },
+  "author": "HE Qichen",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "http": "0.0.0",
+    "fs": "0.0.2",
+    "bl": "~0.9.4",
+    "url": "~0.10.3",
+    "path": "~0.11.14"
+  }
+}
