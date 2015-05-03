@@ -2,8 +2,18 @@
 	<head>
 		<title>Head Position Detect for Faurecia</title>
 		<script src="/static/jquery-1.11.2.min.js"></script>
+		<script src="/static/socket.io-1.3.5.js"></script>
+<script>
+	var socket = io();
+	$(document).ready(function() {
+		$("#testBtn").on("click", function() {
+			socket.emit("test", "hello world");
+		});
+	});
+</script>
 	</head>
 	<body>
 		<h1>It Works!</h1>
+		<a id="testBtn" href="#" onclick="javascript:return false;">test</a>
 	</body>
 </html>

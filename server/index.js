@@ -2,6 +2,7 @@ var http = require("http");
 var url = require("url");
 var path = require('path');
 var fs = require('fs');
+var io = require("socket.io");
 
 
 var mime = require("./mime");
@@ -41,28 +42,72 @@ var httpServer = http.createServer(function(req, resp) {
 		}
 	}
 
-	/*
-
-	var appName = pathSplit[1];
-
-	console.log(pathSplit);
-	console.log("request : " + appName);
-
-	if (appName == "static")
-	{
-		var filename = pathSplit[2];
-		sendFile("static/" + filename, resp);
-	} else 	if (appName == "getFirArray") {
-		sendFile(firFile, resp);
-	} else {
-		resp.writeHead(404);
-		resp.write("Not Found");
-		resp.end();
-	}
-	*/	
-
 });
 
+var ioServer = io(httpServer);
 
+var firstClient = undefined;
+
+var count = 1;
+
+var IoClient = function(socket)
+{
+	var self = this;
+
+	self.previousClient = undefined;
+	self.nextClient = undefined;
+	self.count = count;
+	count += 1;
+	//initialize
+	socket.on("disconnect", function(){
+		if (self.previousClient == undefined) {
+			firstClient = self.nextClient;
+
+			if (self.nextClient != undefined) {
+				self.nextClient.previousClient = this.previousClient;
+			}
+		} else {
+			self.previousClient.nextClient = self.nextClient;
+			if (self.nextClient != undefined) {
+				self.nextClient.previousClient = this.previousClient;
+			}
+		}
+	});
+
+	socket.on("test", function(message) {
+		console.log("tst message from: " + self.count);
+		console.log(message);
+	});
+
+
+	self.insertNew = function(anotherClient) {
+		if (self.nextClient == undefined) {
+			self.nextClient = anotherClient;
+			anotherClient.previousClient = self;
+		} else {
+			self.nextClient.insertNew(anotherClient);
+		}
+	}
+}
+
+var trivialClient = function()
+{
+	var currentClient = firstClient;
+	while (currentClient != undefined) {
+		console.log(currentClient.count);
+		currentClient = currentClient.nextClient;
+	}
+}
+
+ioServer.on("connection", function(socket) {
+	var client = new IoClient(socket);
+	if (firstClient == undefined) {
+		firstClient = client;
+	} else {
+		firstClient.insertNew(client);
+	}
+
+	trivialClient();
+});
 
 httpServer.listen(httpPort);
