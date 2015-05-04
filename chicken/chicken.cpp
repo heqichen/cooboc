@@ -28,7 +28,7 @@ using namespace std;
 
 
 //for test
-#include "./device/driver/io/ws_handler.h"
+#include "./device/driver/io/websocket_handler.h"
 
 Io *io;
 DeviceManager *devManager;
@@ -70,8 +70,6 @@ int main(int argc, char *argv[])
 		ws.sendText(line.c_str());
 	}
 	
-
-
 	return 0;
 	Config config;
 	config.readFile("chicken.cfg");

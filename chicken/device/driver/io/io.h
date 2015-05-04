@@ -4,6 +4,8 @@
 #include "serial_handler.h"
 #include "iic_handler.h"
 #include "gpio_handler.h"
+#include "websocket_handler.h"
+
 
 #ifndef NULL
 #define NULL 0
