@@ -22,9 +22,13 @@ using namespace libconfig;
 #include <iostream>
 #include <utils/util.h>
 #include <unistd.h>
-
-
 using namespace std;
+
+
+
+
+//for test
+#include "./device/driver/io/ws_handler.h"
 
 Io *io;
 DeviceManager *devManager;
@@ -58,6 +62,10 @@ void workForFaurecia(void);
 
 int main(int argc, char *argv[])
 {
+	WsHandler ws("localhost", 8174);
+	int a;
+	cin>>a;
+	return 0;
 	Config config;
 	config.readFile("chicken.cfg");
 	string application = config.lookup("application");
