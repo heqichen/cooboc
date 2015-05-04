@@ -3,7 +3,7 @@ CC=g++
 CFLAGS=-I$(IDIR)
 COMPILE.cc = $(CC) -c -g $(CFLAGS)
 
-OBJS = io.o serial_handler.o iic_handler.o gpio_const.o gpio_manager.o gpio_handler.o
+OBJS = io.o serial_handler.o iic_handler.o gpio_const.o gpio_manager.o gpio_handler.o ws_handler.o
 
 LIBS=
 
@@ -15,6 +15,7 @@ iic_handler.o:	iic_handler.cpp iic_handler.h
 gpio_const.o:	gpio_const.cpp gpio_const.h
 gpio_manager.o:	gpio_manager.cpp gpio_manager.h
 gpio_handler.o:	gpio_handler.cpp gpio_handler.h
+ws_handler.o:	ws_handler.cpp ws_handler.h
 
 .PHONY: clean
 clean:
