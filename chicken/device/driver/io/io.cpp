@@ -5,7 +5,8 @@
 Io::Io()
 	:	mNumOpenedSerialHandler	(0),
 		mNumOpenedIicHandler	(0),
-		mNumOpenedGpioHandler	(0)
+		mNumOpenedGpioHandler	(0),
+		mNumOpenedWebsocketHandler	(0)
 {
 	
 }
@@ -53,4 +54,11 @@ GpioHandler *Io::getGpioHandler(const char *gpioKey)
 	mOpenedGpioHandler[mNumOpenedGpioHandler] = new GpioHandler(gpioKey);
 	++mNumOpenedGpioHandler;
 	return mOpenedGpioHandler[mNumOpenedGpioHandler-1];
+}
+
+WsHandler *Io::getWebsocketHandler(const char *serverAddress, const int port)
+{
+	mOpenedWebsocketHandler[mNumOpenedWebsocketHandler] = new WsHandler(serverAddress, port);
+	++mNumOpenedWebsocketHandler;
+	return mOpenedWebsocketHandler[mNumOpenedWebsocketHandler-1];
 }

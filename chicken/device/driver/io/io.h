@@ -21,7 +21,7 @@ class Io
 		SerialHandler *getSerialHandler(const char *portName);
 		IicHandler *getIicHandler(const char *portName);
 		GpioHandler *getGpioHandler(const char *gpioKey);
-
+		WsHandler *getWebsocketHandler(const char *serverAddress, const int port);
 	private:
 		SerialHandler *mOpenedSerialHandler[MAX_PORT_NUM];
 		int mNumOpenedSerialHandler;
@@ -29,7 +29,8 @@ class Io
 		int mNumOpenedIicHandler;
 		GpioHandler *mOpenedGpioHandler[MAX_PORT_NUM];
 		int mNumOpenedGpioHandler;
-
+		WsHandler *mOpenedWebsocketHandler[MAX_PORT_NUM];
+		int mNumOpenedWebsocketHandler;
 
 };
 

@@ -28,7 +28,7 @@ using namespace std;
 
 
 //for test
-#include "./device/driver/io/websocket_handler.h"
+#include "./device/driver/websocket_driver.h"
 
 Io *io;
 DeviceManager *devManager;
@@ -62,7 +62,8 @@ void workForFaurecia(void);
 
 int main(int argc, char *argv[])
 {
-	WsHandler ws("localhost", 8174);
+	io = new Io();
+	WebsocketDriver ws(io, "localhost", 8174);
 	string line;
 	while (true)
 	{
