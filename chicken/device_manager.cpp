@@ -115,6 +115,14 @@ Hr *DeviceManager::getHr(void)
 	return (Hr*)hrDev;
 }
 
+HrDisplay *DeviceManager::getHrDisplay(const char *serverAddress, const int port)
+{
+	HrDisplay *hrDisplayDev = new HrDisplay(mIo, serverAddress, port);
+	hrDisplayDev->setServer(serverAddress, port);
+	hrDisplayDev->init();
+	return hrDisplayDev;
+}
+
 VirtualImu *DeviceManager::getVirtualImu(void)
 {
 	IDevice *virtualImuDev = findFirstDeviceByType(DEVICE_TYPE_VIRTUAL_IMU);

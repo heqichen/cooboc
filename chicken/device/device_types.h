@@ -11,7 +11,7 @@
 
 
 #define DEVICE_TYPE_HR					0x20
-
+#define DEVICE_TYPE_HR_DISPLAY			0x21
 
 #define DEVICE_TYPE_VIRTUAL_IMU			0x80
 

@@ -15,6 +15,7 @@
 #include "./device/agl.h"
 #include "./device/virtual_imu.h"
 #include "./device/hr.h"
+#include "./device/hr_display.h"
 
 #define MAX_DEVICES_IN_CHICKEN 256
 
@@ -30,6 +31,7 @@ class DeviceManager
 		Beeper *getBeeper(void);
 		Agl *getAgl(void);
 		Hr *getHr(void);
+		HrDisplay *getHrDisplay(const char *serverAddress, const int port);
 		VirtualImu *getVirtualImu(void);
 	private:
 		Io *mIo;

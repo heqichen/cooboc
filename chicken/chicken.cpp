@@ -7,6 +7,7 @@
 #include "./device/beeper.h"
 #include "./device/virtual_imu.h"
 #include "./device/hr.h"
+#include "./device/hr_display.h"
 #include "./instruments/adi.h"
 #include "status_controller.h"
 #include "attitude_controller.h"
@@ -25,11 +26,6 @@ using namespace libconfig;
 using namespace std;
 
 
-
-
-//for test
-#include "./device/driver/websocket_driver.h"
-
 Io *io;
 DeviceManager *devManager;
 Radio *radio;
@@ -39,6 +35,7 @@ Aoa *aoa;
 Beeper *beeper;
 Agl *agl;
 Hr *hr;
+HrDisplay *hrDisplay;
 
 VirtualImu *virtualImu;
 ADI *adi;
@@ -62,16 +59,6 @@ void workForFaurecia(void);
 
 int main(int argc, char *argv[])
 {
-	io = new Io();
-	WebsocketDriver ws(io, "localhost", 8174);
-	string line;
-	while (true)
-	{
-		getline(cin, line);
-		ws.sendText(line.c_str());
-	}
-	
-	return 0;
 	Config config;
 	config.readFile("chicken.cfg");
 	string application = config.lookup("application");
@@ -96,8 +83,23 @@ void setupDeviceForFaurecia()
 {
 	io = new Io();
 	devManager = new DeviceManager(io);
+	int dist[2];
+	hrDisplay = devManager->getHrDisplay("localhost", 8174);
 
-	hr = devManager->getHr();
+	
+	string line;
+
+	while (true)
+	{
+		//getline(cin, line);
+		//ws.sendText(line.c_str());
+
+		cin>>dist[0];
+		cin>>dist[1];
+		cout<<"s"<<endl;
+		hrDisplay->sendDistance(dist);
+	}
+	//hr = devManager->getHr();
 }
 
 void workForFaurecia()
