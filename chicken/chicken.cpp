@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	while (true)
 	{
 		getline(cin, line);
-		cout<<ws.sendText(line.c_str());
+		ws.sendText(line.c_str());
 	}
 	
 
