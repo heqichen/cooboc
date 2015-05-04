@@ -1,6 +1,9 @@
+CC=cc
 LWS_OBJ=alloc.o base64-decode.o handshake.o output.o client.o header.o parsers.o client-handshake.o pollfd.o client-parser.o server.o context.o server-handshake.o libwebsockets.o service.o extension.o lws-plat-unix.o sha-1.o extension-deflate-frame.o ssl.o extension-deflate-stream.o
 
 CFLAGS=-g
+
+COMPILE.cc = $(CC) -c $(CFLAGS)
 
 all:	$(LWS_OBJ)
 

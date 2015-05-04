@@ -134,7 +134,7 @@ void *startWebsocketDaemon(void *wsHandlerPtr)
 
 
 
-WsHandler::WsHandler(char *serverAddress, int port)
+WsHandler::WsHandler(const char *serverAddress, int port)
 	:	mIsGood	(false),
 		mWsStatus	(WS_STATUS_DISCONNECT),
 		mServerAddress	(NULL),

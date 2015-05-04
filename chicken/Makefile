@@ -1,5 +1,5 @@
 IDIR = ./
-CC=g++
+CXX=g++
 CFLAGS=-I$(IDIR) -I../inc/mavlink/common
 LIBS=-lpthread -lz -lssl -lcrypto
 COMPILE.cc = $(CC) -c -g $(CFLAGS)
@@ -19,12 +19,12 @@ OBJS = chicken.o device_manager.o status_controller.o attitude_controller.o $(UT
 
 TARGET = chicken
 
-SUB_DIR = ./utils ./utils/libconfig ./utils/libconfig ./device ./device/driver ./device/driver/io ./instruments ./navigator
+SUB_DIR = ./utils ./utils/libconfig ./utils/libwebsockets ./device ./device/driver ./device/driver/io ./instruments ./navigator
 
 all:	RETRIVE_SUB_DIR $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $(OBJS) $(LIBS) 
+	$(CXX) -o $@ $(OBJS) $(LIBS) 
 
 RETRIVE_SUB_DIR:
 	for dir in $(SUB_DIR); do\

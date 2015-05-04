@@ -14,7 +14,7 @@
 class WsHandler
 {
 	public:
-		WsHandler(char *serverAddress, int port);
+		WsHandler(const char *serverAddress, int port);
 		~WsHandler();
 
 		void connectServer();
