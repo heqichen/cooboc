@@ -63,8 +63,15 @@ void workForFaurecia(void);
 int main(int argc, char *argv[])
 {
 	WsHandler ws("localhost", 8174);
-	int a;
-	cin>>a;
+	string line;
+	while (true)
+	{
+		getline(cin, line);
+		cout<<ws.sendText(line.c_str());
+	}
+	
+
+
 	return 0;
 	Config config;
 	config.readFile("chicken.cfg");

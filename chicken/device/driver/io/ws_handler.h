@@ -24,7 +24,8 @@ class WsHandler
 		inline bool isRunning() const {return mIsRunning;}
 		inline int getStatus() const {return mWsStatus;}
 		void setWsStatus(int status);
-		bool sendText(char *text);
+		bool sendText(const char *text);
+		void doSendText();
 	private:
 		bool mIsGood;
 		bool mIsRunning;
@@ -35,7 +36,9 @@ class WsHandler
 		libwebsocket_context *mWsContext;
 		libwebsocket *mWsi;
 		lws_context_creation_info mWsInfo;
-
+		//TODO: check length before sending
+		unsigned char mWsBuffer[LWS_SEND_BUFFER_PRE_PADDING + 4096 +LWS_SEND_BUFFER_POST_PADDING];
+		int mSendLength;
 };
 
 #endif
