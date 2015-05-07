@@ -18,6 +18,8 @@ class Hr	:	public IDevice
 		~Hr();
 		virtual void init();
 
+		bool hasNewData();
+		const int *getDistData();
 		void test();
 	private:
 		HrDriver *mHrDriver;

@@ -14,7 +14,7 @@ class HrDisplay	:	public IDevice
 
 		void setServer(const char *serverAddress, const int port);
 
-		void sendDistance(int *value);
+		void sendDistance(const int *value);
 	private:
 		WebsocketDriver *mWebsocketDriver;
 		char *mServerAddress;

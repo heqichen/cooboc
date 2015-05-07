@@ -20,12 +20,18 @@ class HrDriver
 		inline bool isReadingThreadRunning() const {return mIsReadThreadRunning;}
 
 		void readData();
+
+		const int *getDistData();
+		bool hasNewData() const {return mHasNewData;}
+
 	private:
 		SerialHandler *mSerialHandler;
 		bool mIsReadThreadRunning;
 		pthread_t mReadThread;
 		uint8_t mReadBuffer[1024];
 		uint8_t mReadDataBuffer[1024];
+		int mDist[2];
+		bool mHasNewData;
 		SaModem mSaModem;
 		
 };

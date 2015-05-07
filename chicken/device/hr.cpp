@@ -26,3 +26,13 @@ void Hr::init()
 void Hr::test()
 {
 }
+
+bool Hr::hasNewData()
+{
+	return mHrDriver->hasNewData();
+}
+
+const int *Hr::getDistData()
+{
+	return mHrDriver->getDistData();
+}

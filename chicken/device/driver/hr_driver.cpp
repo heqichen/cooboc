@@ -10,18 +10,22 @@ void *startReadHrDataThread(void *hrDriverPtr)
 	while (hrDriver->isReadingThreadRunning())
 	{
 		hrDriver->readData();
+		usleep(10000UL);
 	}
 }
 
 HrDriver::HrDriver(Io *io)
 	:	mSerialHandler			(NULL),
-		mIsReadThreadRunning	(false)
+		mIsReadThreadRunning	(false),
+		mHasNewData				(false)
 {
 	mSerialHandler = io->getSerialHandler("/dev/ttyUSB0");
 	mSerialHandler->setBlockRead(true);
 	mSerialHandler->setBaudrate(9600);
 	mIsReadThreadRunning = true;
 	pthread_create(&mReadThread, NULL, &startReadHrDataThread, this);
+	mDist[0] = 0;
+	mDist[1] = 0;
 }
 
 HrDriver::~HrDriver()
@@ -30,11 +34,11 @@ HrDriver::~HrDriver()
 	pthread_join(mReadThread, NULL);
 }
 
-void HrDriver::readData()
+void HrDriver::readData(void)
 {
 	int i;
 	int a0, a1;
-#warning "current length of packet from hr sensor is 4"
+#warning "current length of packet from hr sensor arduino is 4"
 
 	int length = mSerialHandler->recv(mReadBuffer,1024);
 	for (i=0; i<length; ++i)
@@ -50,12 +54,19 @@ void HrDriver::readData()
 			a1 <<= 8;
 			a1 |= mReadDataBuffer[2];
 
-			cout<<a0<<" , "<<a1<<endl;
+			mDist[0] = a0;
+			mDist[1] = a1;
+			mHasNewData = true;
 		}
 	}
 
 	//cout<<"read " << length <<endl;
-	
-	usleep(10000UL);
 }
 
+
+
+const int *HrDriver::getDistData()
+{
+	mHasNewData = false;
+	return mDist;
+}

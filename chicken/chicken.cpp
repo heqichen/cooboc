@@ -85,7 +85,7 @@ void setupDeviceForFaurecia()
 	devManager = new DeviceManager(io);
 	int dist[2];
 	hrDisplay = devManager->getHrDisplay("localhost", 8174);
-
+	hr = devManager->getHr();
 	
 	string line;
 
@@ -94,12 +94,21 @@ void setupDeviceForFaurecia()
 		//getline(cin, line);
 		//ws.sendText(line.c_str());
 
-		cin>>dist[0];
-		cin>>dist[1];
-		cout<<"s"<<endl;
-		hrDisplay->sendDistance(dist);
+		//cin>>dist[0];
+		//cin>>dist[1];
+		//cout<<"s"<<endl;
+		//hrDisplay->sendDistance(dist);
+
+		if (hr->hasNewData())
+		{
+			const int *data = hr->getDistData();
+			cout<<data[0]<<"\t, "<<data[1]<<endl;
+			hrDisplay->sendDistance(data);
+			usleep(5000);
+
+		}
 	}
-	//hr = devManager->getHr();
+	//
 }
 
 void workForFaurecia()
