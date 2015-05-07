@@ -89,6 +89,14 @@ var IoClient = function(socket)
 			self.nextClient.insertNew(anotherClient);
 		}
 	}
+
+	self.trivialEmitData = function(data) {
+		socket.emit("data", data);
+		//console.log("emit data " + data);
+		if (self.nextClient != undefined) {
+			self.nextClient.trivialEmitData(data);
+		}
+	}
 }
 
 var trivialClient = function()
@@ -120,7 +128,10 @@ var server = ws.createServer(function(conn) {
 	console.log("new Connection come in");
 	conn.sendText("hello wld");
 	conn.on("text", function(str) {
-		console.log("recv: " + str);
+		//console.log("recv: " + str);
+		if (firstClient != undefined) {
+			firstClient.trivialEmitData(str);
+		}
 	});
 	conn.on("close", function(code, reason) {
 		console.log("connection closed");

@@ -51,6 +51,6 @@ void HrDisplay::init()
 
 void HrDisplay::sendDistance(const int *value)
 {
-	sprintf(mTextBuffer, "{dist1:%d, dist2:%d}", value[0], value[1]);
+	sprintf(mTextBuffer, "{\"dist0\":%d, \"dist1\":%d}", value[0], value[1]);
 	mWebsocketDriver->sendText(mTextBuffer);
 }

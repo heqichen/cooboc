@@ -4,10 +4,18 @@
 		<script src="/static/jquery-1.11.2.min.js"></script>
 		<script src="/static/socket.io-1.3.5.js"></script>
 <script>
-	var socket = io();
+	var socket = io("http://localhost:8173");
 	$(document).ready(function() {
+		socket.on("data", function(data) {
+			distObj = eval("("+data+")");
+			//console.log(distObj);
+			$("#dist0").text(distObj.dist0);
+			$("#dist1").text(distObj.dist1);
+
+		});
 		$("#testBtn").on("click", function() {
 			socket.emit("test", "hello world");
+			
 		});
 	});
 </script>
@@ -15,5 +23,9 @@
 	<body>
 		<h1>It Works!</h1>
 		<a id="testBtn" href="#" onclick="javascript:return false;">test</a>
+		<div id="display">
+			Dist0: <span id="dist0">N/A</span><br />
+			Dist1: <span id="dist1">N/A</span><br />
+		</div>
 	</body>
 </html>

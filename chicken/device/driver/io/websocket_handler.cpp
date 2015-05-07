@@ -227,7 +227,7 @@ bool WsHandler::sendText(const char *text)
 {
 	if (mIsGood)
 	{
-		mSendLength = strlen(text) + 1;
+		mSendLength = strlen(text);
 		strncpy((char *)&mWsBuffer[LWS_SEND_BUFFER_PRE_PADDING], text, mSendLength);
 		libwebsocket_callback_on_writable(mWsContext, mWsi);
 		touchServer();
