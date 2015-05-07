@@ -3,7 +3,7 @@ var url = require("url");
 var path = require('path');
 var fs = require('fs');
 var io = require("socket.io");
-
+var ws = require("nodejs-websocket");
 
 var mime = require("./mime");
 
@@ -11,6 +11,7 @@ var config = require("./config");
 
 
 var httpPort = Number(process.argv[2]);
+var wsPort = Number(process.argv[3]);
 
 var sendFile = function(filename, resp) {
 	var extension = path.extname(filename);
@@ -111,3 +112,17 @@ ioServer.on("connection", function(socket) {
 });
 
 httpServer.listen(httpPort);
+
+var server = ws.createServer(function(conn) {
+	conn.on("error", function(reason, code) {
+		console.log('socket error: reason ' + reason + ', code ' + code);
+	});
+	console.log("new Connection come in");
+	conn.sendText("hello wld");
+	conn.on("text", function(str) {
+		console.log("recv: " + str);
+	});
+	conn.on("close", function(code, reason) {
+		console.log("connection closed");
+	});
+}).listen(wsPort);
