@@ -129,11 +129,11 @@ void loop()
 	Serial.write('A');
 	Serial.write(6);
 	tmp = hrPosition;
-	b = (unsigned char)(tmp & 0xFF);
+	b = (unsigned char)(tmp & 0x00FF);
 	crc = b;
 	Serial.write(b);
 	tmp >>= 8;
-	b = (unsigned char)(tmp & 0xFF);
+	b = (unsigned char)(tmp & 0x00FF);
 	crc ^= b;
 	Serial.write(b);
 
