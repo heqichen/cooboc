@@ -20,7 +20,7 @@ int stepperMotorPin[4] = {PIN_INA1, PIN_INB1, PIN_INA2, PIN_INB2};
 #define MOVING_STATUS_DOWN	2
 
 int hrMovingStatus;
-
+int hrPosition;
 
 void setup()
 {
@@ -42,12 +42,26 @@ void setup()
 	Serial.begin(9600);
 
 	hrMovingStatus = MOVING_STATUS_STOP;
+	hrPosition = 0;
 }
 
 
 
 void loop()
 {
+	int d1;
+	int d2;
+	int tmp;
+	unsigned char b;
+	unsigned char crc;
+	/*
+	Serial.print(hrPosition);
+	Serial.print("  :   ");
+	Serial.print(analogRead(A0));
+	Serial.print("  ");
+	Serial.print(analogRead(A1));
+	Serial.println();
+	*/
 	while (Serial.available())
 	{
 		char c;
@@ -64,9 +78,14 @@ void loop()
 				hrMovingStatus = MOVING_STATUS_DOWN;
 				break;
 			}
-			default:
+			case ' ':
 			{
 				hrMovingStatus = MOVING_STATUS_STOP;
+				break;
+			}
+			default:
+			{
+				
 				break;
 			}
 		}
@@ -91,8 +110,43 @@ void loop()
 		}
 	}
 
+	d1 = analogRead(A0);
+	d2 = analogRead(A1);
 
+	//send data
+	Serial.write('S');
+	Serial.write('A');
+	Serial.write(6);
+	tmp = hrPosition;
+	b = (unsigned char)(tmp & 0xFF);
+	crc = b;
+	Serial.write(b);
+	tmp >>= 8;
+	b = (unsigned char)(tmp & 0xFF);
+	crc ^= b;
+	Serial.write(b);
 
+	tmp = d1;
+	b = (unsigned char)(tmp & 0xFF);
+	crc ^= b;
+	Serial.write(b);
+	tmp >>= 8;
+	b = (unsigned char)(tmp & 0xFF);
+	crc ^= b;
+	Serial.write(b);
+
+	tmp = d2;
+	b = (unsigned char)(tmp & 0xFF);
+	crc ^= b;
+	Serial.write(b);
+	tmp >>= 8;
+	b = (unsigned char)(tmp & 0xFF);
+	crc ^= b;
+	Serial.write(b);
+
+	Serial.write(crc);
+	Serial.write('\r');
+	Serial.write('\n');
 }
 
 
@@ -112,8 +166,8 @@ void moveHrUp()
 		digitalWrite(stepperMotorPin[(i+3) % 4], LOW);
 		delay(4 * MOTOR_TICK_TIME);
 		digitalWrite(stepperMotorPin[i], LOW);
-
 	}
+	++hrPosition;
 
 }
 
@@ -122,6 +176,7 @@ void moveHrDown()
 	int i;
 	if (!digitalRead(PIN_LIMIT_BOTTOM))
 	{
+		hrPosition = 0;
 		hrMovingStatus = MOVING_STATUS_STOP;
 		return ;
 	}
@@ -133,7 +188,7 @@ void moveHrDown()
 		digitalWrite(stepperMotorPin[(i+1) % 4], LOW);
 		delay(4 * MOTOR_TICK_TIME);
 		digitalWrite(stepperMotorPin[i], LOW);
-
 	}
+	--hrPosition;
 
 }
