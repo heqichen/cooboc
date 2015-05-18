@@ -89,6 +89,7 @@ void loop()
 				{
 					moveHrDown();
 				}
+				hrPosition = 0;
 				while (Serial.available())
 				{
 					Serial.read();
