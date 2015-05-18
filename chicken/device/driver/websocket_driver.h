@@ -10,6 +10,9 @@ class WebsocketDriver
 		WebsocketDriver(Io *io, const char *serverAddr, const int port);
 		~WebsocketDriver();
 		bool sendText(const char *text);
+		bool hasNewMessage();
+		const char *getReceivedMessage();
+
 	private:
 		WsHandler *mWebsocketHandler;
 };

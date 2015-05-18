@@ -27,6 +27,7 @@ class HrDriver
 		void moveUp();
 		void moveDown();
 		void stopMove();
+		void resetPosition();
 	private:
 		SerialHandler *mSerialHandler;
 		bool mIsReadThreadRunning;

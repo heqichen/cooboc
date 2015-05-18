@@ -23,9 +23,12 @@ class WsHandler
 		inline bool isGood() const{return mIsGood;}
 		inline bool isRunning() const {return mIsRunning;}
 		inline int getStatus() const {return mWsStatus;}
+		inline bool hasNewMessage() const {return mHasNewMessage;}
 		void setWsStatus(int status);
 		bool sendText(const char *text);
 		void doSendText();
+		void onMessageReceived(const char *data, int len);
+		const char * getReceivedMessage();
 	private:
 		bool mIsGood;
 		bool mIsRunning;
@@ -39,6 +42,8 @@ class WsHandler
 		//TODO: check length before sending
 		unsigned char mWsBuffer[LWS_SEND_BUFFER_PRE_PADDING + 4096 +LWS_SEND_BUFFER_POST_PADDING];
 		int mSendLength;
+		char mReceivedMessage[1024];
+		bool mHasNewMessage;
 };
 
 #endif

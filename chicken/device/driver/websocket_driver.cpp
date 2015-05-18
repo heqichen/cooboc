@@ -22,3 +22,13 @@ bool WebsocketDriver::sendText(const char *text)
 {
 	return mWebsocketHandler->sendText(text);
 }
+
+bool WebsocketDriver::hasNewMessage()
+{
+	return mWebsocketHandler->hasNewMessage();
+}
+const char *WebsocketDriver::getReceivedMessage()
+{
+	return mWebsocketHandler->getReceivedMessage();
+}
+

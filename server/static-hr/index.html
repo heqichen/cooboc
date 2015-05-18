@@ -15,7 +15,18 @@
 		});
 		$("#testBtn").on("click", function() {
 			socket.emit("test", "hello world");
-			
+		});
+		$("#moveUp").on("click", function() {
+			socket.emit("control", "moveUp");
+		});
+		$("#moveDown").on("click", function() {
+			socket.emit("control", "moveDown");
+		});
+		$("#stopMove").on("click", function() {
+			socket.emit("control", "stopMove");
+		});
+		$("#reset").on("click", function() {
+			socket.emit("control", "reset");
 		});
 	});
 </script>
@@ -26,6 +37,13 @@
 		<div id="display">
 			Dist0: <span id="dist0">N/A</span><br />
 			Dist1: <span id="dist1">N/A</span><br />
+		</div>
+		<div id="control">
+			<input type="button" id="moveUp" value="moveUp"  onclick="javascript:return false;"/>
+			<input type="button" id="moveDown" value="moveDown" onclick="javascript:return false;"/>
+			<input type="button" id="stopMove" value="stopMove" onclick="javascript:return false;"/>
+			<input type="button" id="reset" value="reset" onclick="javascript:return false;"/>
+			
 		</div>
 	</body>
 </html>

@@ -42,6 +42,15 @@ static int plainProtocolCallback(libwebsocket_context *ctx, libwebsocket *wsi, l
 			{
 				wsHandler->doSendText();
 			}
+			break;
+		}
+		case (LWS_CALLBACK_CLIENT_RECEIVE):
+		{
+			if (wsHandler != NULL)
+			{
+				wsHandler->onMessageReceived((const char *)in, len);
+			}
+			break;
 		}
 
 		case (LWS_CALLBACK_ESTABLISHED):
@@ -49,7 +58,7 @@ static int plainProtocolCallback(libwebsocket_context *ctx, libwebsocket *wsi, l
 		case (LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH):
 		case (LWS_CALLBACK_CLOSED_HTTP):
 		case (LWS_CALLBACK_RECEIVE):
-		case (LWS_CALLBACK_CLIENT_RECEIVE):
+
 		case (LWS_CALLBACK_CLIENT_RECEIVE_PONG):
 		case (LWS_CALLBACK_SERVER_WRITEABLE):
 		case (LWS_CALLBACK_HTTP):
@@ -106,7 +115,6 @@ void *startWebsocketDaemon(void *wsHandlerPtr)
 	cout<<"stand for "<<wsHandlerPtr<<endl;
 	while (wsHandler->isRunning())
 	{
-
 		int status = wsHandler->getStatus();
 		//cout<<"routine statis:" << status<<endl;
 		switch (status)
@@ -139,7 +147,8 @@ WsHandler::WsHandler(const char *serverAddress, int port)
 		mWsStatus	(WS_STATUS_DISCONNECT),
 		mServerAddress	(NULL),
 		mPort	(0),
-		mSendLength	(0)
+		mSendLength	(0),
+		mHasNewMessage	(false)
 {
 	int serverAddressLen = strlen(serverAddress);
 	mServerAddress = new char[serverAddressLen+1];
@@ -238,6 +247,21 @@ bool WsHandler::sendText(const char *text)
 void WsHandler::doSendText(void)
 {
 	libwebsocket_write(mWsi, &mWsBuffer[LWS_SEND_BUFFER_PRE_PADDING], mSendLength, LWS_WRITE_TEXT);
+}
+
+void WsHandler::onMessageReceived(const char *data, int len)
+{
+	strncpy(mReceivedMessage, data, len);
+	mReceivedMessage[len] = '\0';
+	mHasNewMessage = true;
+}
+
+const char * WsHandler::getReceivedMessage()
+{
+	char *tmp;
+	tmp = mReceivedMessage;
+	mHasNewMessage =false;
+	return tmp;
 }
 
 #define SOCKET_POOL_SIZE	1024

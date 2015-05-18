@@ -114,9 +114,28 @@ void setupDeviceForFaurecia()
 			usleep(5000);
 		}
 
-		if (hp > 500)
+		if (hrDisplay->hasNewMessage())
 		{
-			hr->stopMove();
+			const char *message = hrDisplay->getReceivedMessage();
+			cout<<"======================================"<<endl;
+			cout<<hrDisplay->getReceivedMessage()<<endl;
+			cout<<"======================================"<<endl;
+			if (strcmp(message, "moveUp") == 0)
+			{
+				hr->moveUp();
+			}
+			if (strcmp(message, "moveDown") == 0)
+			{
+				hr->moveDown();
+			}
+			if (strcmp(message, "stopMove") == 0)
+			{
+				hr->stopMove();
+			}
+			if (strcmp(message, "reset") == 0)
+			{
+				hr->resetPosition();
+			}
 		}
 	}
 }

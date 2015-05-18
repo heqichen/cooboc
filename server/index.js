@@ -51,6 +51,8 @@ var firstClient = undefined;
 
 var count = 1;
 
+var serverConnection = undefined;
+
 var IoClient = function(socket)
 {
 	var self = this;
@@ -79,6 +81,11 @@ var IoClient = function(socket)
 		console.log("tst message from: " + self.count);
 		console.log(message);
 	});
+	socket.on("control", function(message) {
+		if (serverConnection != undefined) {
+			serverConnection.sendText(message);
+		}
+	})
 
 
 	self.insertNew = function(anotherClient) {
@@ -122,6 +129,7 @@ ioServer.on("connection", function(socket) {
 httpServer.listen(httpPort);
 
 var server = ws.createServer(function(conn) {
+	serverConnection = conn;
 	conn.on("error", function(reason, code) {
 		console.log('socket error: reason ' + reason + ', code ' + code);
 	});
@@ -135,5 +143,6 @@ var server = ws.createServer(function(conn) {
 	});
 	conn.on("close", function(code, reason) {
 		console.log("connection closed");
+		serverConnection = undefined;
 	});
 }).listen(wsPort);

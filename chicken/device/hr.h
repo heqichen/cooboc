@@ -24,6 +24,7 @@ class Hr	:	public IDevice
 		void moveUp();
 		void moveDown();
 		void stopMove();
+		void resetPosition();
 		void test();
 	private:
 		HrDriver *mHrDriver;

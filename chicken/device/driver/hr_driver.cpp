@@ -98,3 +98,7 @@ void HrDriver::stopMove()
 	mSerialHandler->send((const uint8_t *)" ", 1);
 }
 
+void HrDriver::resetPosition()
+{
+	mSerialHandler->send((const uint8_t *)"r", 1);
+}

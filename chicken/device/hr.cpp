@@ -57,3 +57,8 @@ void Hr::stopMove()
 {
 	mHrDriver->stopMove();
 }
+
+void Hr::resetPosition()
+{
+	mHrDriver->resetPosition();
+}
