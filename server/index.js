@@ -127,6 +127,7 @@ ioServer.on("connection", function(socket) {
 });
 
 httpServer.listen(httpPort);
+console.log("Please go to http://localhost:" + httpPort + "/static/index.html");
 
 var server = ws.createServer(function(conn) {
 	serverConnection = conn;
