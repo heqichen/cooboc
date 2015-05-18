@@ -22,8 +22,11 @@ class HrDriver
 		void readData();
 
 		const int *getDistData();
+		const int getHrPosition() const {return mHrPosition;}
 		bool hasNewData() const {return mHasNewData;}
-
+		void moveUp();
+		void moveDown();
+		void stopMove();
 	private:
 		SerialHandler *mSerialHandler;
 		bool mIsReadThreadRunning;
@@ -31,6 +34,7 @@ class HrDriver
 		uint8_t mReadBuffer[1024];
 		uint8_t mReadDataBuffer[1024];
 		int mDist[2];
+		int mHrPosition;
 		bool mHasNewData;
 		SaModem mSaModem;
 		

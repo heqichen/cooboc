@@ -36,3 +36,24 @@ const int *Hr::getDistData()
 {
 	return mHrDriver->getDistData();
 }
+
+const int Hr::getHrPosition()
+{
+	return mHrDriver->getHrPosition();
+}
+
+
+void Hr::moveUp()
+{
+	mHrDriver->moveUp();
+}
+
+void Hr::moveDown()
+{
+	mHrDriver->moveDown();
+}
+
+void Hr::stopMove()
+{
+	mHrDriver->stopMove();
+}

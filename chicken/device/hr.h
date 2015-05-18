@@ -20,6 +20,10 @@ class Hr	:	public IDevice
 
 		bool hasNewData();
 		const int *getDistData();
+		const int getHrPosition();
+		void moveUp();
+		void moveDown();
+		void stopMove();
 		void test();
 	private:
 		HrDriver *mHrDriver;

@@ -89,8 +89,13 @@ void setupDeviceForFaurecia()
 	
 	string line;
 
+	usleep(2000000UL);
+	hr->moveDown();
+
 	while (true)
 	{
+		int hp;
+		const int *data;
 		//getline(cin, line);
 		//ws.sendText(line.c_str());
 
@@ -101,12 +106,17 @@ void setupDeviceForFaurecia()
 
 		if (hr->hasNewData())
 		{
-			const int *data = hr->getDistData();
-			cout<<data[0]<<"\t, "<<data[1]<<endl;
+			const int hrPosition = hr->getHrPosition();
+			hp = hrPosition;
+			data = hr->getDistData();
+			cout<<hrPosition<<":\t"<<data[0]<<"\t, "<<data[1]<<endl;
 			hrDisplay->sendDistance(data);
 			usleep(5000);
 
 		}
+
+
+
 	}
 	//
 }
