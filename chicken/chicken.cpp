@@ -88,10 +88,6 @@ void setupDeviceForFaurecia()
 	hr = devManager->getHr();
 	
 	string line;
-
-	usleep(3000000UL);
-	hr->moveUp();
-
 	while (true)
 	{
 		int hp;
