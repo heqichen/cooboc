@@ -114,11 +114,7 @@ void setupDeviceForFaurecia()
 			usleep(5000);
 
 		}
-
-
-
 	}
-	//
 }
 
 void workForFaurecia()
