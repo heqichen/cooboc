@@ -10,7 +10,9 @@
 			distObj = eval("("+data+")");
 			//console.log(distObj);
 			$("#dist0").text(distObj.dist0);
+			$("#dist0show").css("width", Number(distObj.dist0));
 			$("#dist1").text(distObj.dist1);
+			$("#dist1show").css("width", Number(distObj.dist1));
 
 		});
 		$("#testBtn").on("click", function() {
@@ -30,13 +32,22 @@
 		});
 	});
 </script>
+<style>
+	.bar
+	{
+		display:	block;
+		height:	5px;
+		width:	100px;
+		background-color: 	red;
+	}
+</style>
 	</head>
 	<body>
 		<h1>It Works!</h1>
 		<a id="testBtn" href="#" onclick="javascript:return false;">test</a>
 		<div id="display">
-			Dist0: <span id="dist0">N/A</span><br />
-			Dist1: <span id="dist1">N/A</span><br />
+			Dist0: <span id="dist0">N/A</span><div id="dist0show" class="bar">&nbsp;</div><br />
+			Dist1: <span id="dist1">N/A</span><div id="dist1show" class="bar">&nbsp;</div><br />
 		</div>
 		<div id="control">
 			<input type="button" id="moveUp" value="moveUp"  onclick="javascript:return false;"/>
