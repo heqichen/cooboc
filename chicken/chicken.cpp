@@ -89,8 +89,8 @@ void setupDeviceForFaurecia()
 	
 	string line;
 
-	usleep(2000000UL);
-	hr->moveDown();
+	usleep(3000000UL);
+	hr->moveUp();
 
 	while (true)
 	{
@@ -112,7 +112,11 @@ void setupDeviceForFaurecia()
 			cout<<hrPosition<<":\t"<<data[0]<<"\t, "<<data[1]<<endl;
 			hrDisplay->sendDistance(data);
 			usleep(5000);
+		}
 
+		if (hp > 500)
+		{
+			hr->stopMove();
 		}
 	}
 }

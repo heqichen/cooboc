@@ -72,7 +72,7 @@ void SerialHandler::send(const uint8_t *buf, int len)
 {
 	pthread_mutex_lock(&mMutex);
 	write(mTtyFile, buf, len);
-	cout<<"writ: "<<(char)buf[0]<<endl;
+	//cout<<"writ: "<<(char)buf[0]<<endl;
 	pthread_mutex_unlock(&mMutex);
 }
 

@@ -40,7 +40,7 @@ void HrDriver::readData(void)
 	int i;
 
 	int a0, a1;
-	int8_t hrPos;
+	int16_t hrPos;
 #warning "current length of packet from hr sensor arduino is 6"
 
 	int length = mSerialHandler->recv(mReadBuffer,1024);
@@ -65,7 +65,7 @@ void HrDriver::readData(void)
 			mDist[1] = a1;
 			mHrPosition = hrPos;
 			mHasNewData = true;
-			cout<<mHrPosition<<endl;
+			//cout<<mHrPosition<<endl;
 		}
 	}
 
