@@ -15,6 +15,12 @@ int stepperMotorPin[4] = {PIN_INA1, PIN_INB1, PIN_INA2, PIN_INB2};
 
 #define MOTOR_TICK_TIME 1
 
+#define MOVING_STATUS_STOP	0
+#define MOVING_STATUS_UP	1
+#define MOVING_STATUS_DOWN	2
+
+int hrMovingStatus;
+
 
 void setup()
 {
@@ -34,27 +40,57 @@ void setup()
 	digitalWrite(PIN_LIMIT_TOP, HIGH);
 	digitalWrite(PIN_LIMIT_BOTTOM, HIGH);
 	Serial.begin(9600);
+
+	hrMovingStatus = MOVING_STATUS_STOP;
 }
 
 
 
 void loop()
 {
-	if (!digitalRead(PIN_LIMIT_TOP))
+	while (Serial.available())
 	{
-		moveHrDown();
+		char c;
+		c = Serial.read();
+		switch (c)
+		{
+			case 'w':
+			{
+				hrMovingStatus = MOVING_STATUS_UP;
+				break;
+			}
+			case 's':
+			{
+				hrMovingStatus = MOVING_STATUS_DOWN;
+				break;
+			}
+			default:
+			{
+				hrMovingStatus = MOVING_STATUS_STOP;
+				break;
+			}
+		}
 	}
-	else
+
+	switch (hrMovingStatus)
 	{
-		if (!digitalRead(PIN_LIMIT_BOTTOM))
+		case MOVING_STATUS_UP:
 		{
 			moveHrUp();
+			break;
 		}
-		else
+		case MOVING_STATUS_DOWN:
 		{
-			delay(10);
+			moveHrDown();
+			break;
+		}
+		default:
+		{
+			delay(12 * MOTOR_TICK_TIME);
+			break;
 		}
 	}
+
 
 
 }
@@ -63,7 +99,11 @@ void loop()
 void moveHrUp()
 {
 	int i;
-	
+	if (!digitalRead(PIN_LIMIT_TOP))
+	{
+		hrMovingStatus = MOVING_STATUS_STOP;
+		return ;
+	}
 	for (i=0; i<4; ++i)
 	{
 		digitalWrite(stepperMotorPin[i], HIGH);
@@ -80,7 +120,11 @@ void moveHrUp()
 void moveHrDown()
 {
 	int i;
-	
+	if (!digitalRead(PIN_LIMIT_BOTTOM))
+	{
+		hrMovingStatus = MOVING_STATUS_STOP;
+		return ;
+	}
 	for (i=3; i>=0; --i)
 	{
 		digitalWrite(stepperMotorPin[i], HIGH);
